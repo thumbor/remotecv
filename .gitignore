@@ -1,0 +1,15 @@
+*.pyc
+.DS_Store
+*.swp
+dist/
+*.egg-info
+.project
+.pydevprojectthumbor/tests/visual_test/img
+.coverage
+tests/visual_test/img/
+*.swo
+*.swm
+*.swn
+tests/visual_test/build
+build
+*.so

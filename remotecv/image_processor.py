@@ -1,8 +1,8 @@
 
-from detectors.face_detector import FaceDetector
-from detectors.feature_detector import FeatureDetector
-from detectors.glasses_detector import GlassesDetector
-from detectors.profile_detector import ProfileDetector
+from remotecv.detectors.face_detector import FaceDetector
+from remotecv.detectors.feature_detector import FeatureDetector
+from remotecv.detectors.glasses_detector import GlassesDetector
+from remotecv.detectors.profile_detector import ProfileDetector
 
 class ImageProcessor:
     def __init__(self):

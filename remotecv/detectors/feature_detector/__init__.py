@@ -10,7 +10,7 @@
 
 import cv
 
-from detectors import BaseDetector
+from remotecv.detectors import BaseDetector
 
 class FeatureDetector(BaseDetector):
 

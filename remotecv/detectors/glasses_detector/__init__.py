@@ -8,7 +8,7 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
-from detectors import CascadeLoaderDetector
+from remotecv.detectors import CascadeLoaderDetector
 
 class GlassesDetector(CascadeLoaderDetector):
 

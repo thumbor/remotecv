@@ -8,7 +8,7 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
-from setuptools import setup, Extension
+from setuptools import setup, find_packages
 from remotecv import __version__
 
 setup(
@@ -33,8 +33,10 @@ remotecv is an OpenCV server for facial and feature recognition
                    'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
                    'Topic :: Multimedia :: Graphics :: Presentation'
     ],
-    packages = ['remotecv'],
-    package_dir = {"remotecv": "remotecv"},
+    packages = find_packages(),
+    package_data = {
+        '': ['*.xml'],
+    },
 
     install_requires=[
         "pyzmq>=2.1.11,<2.2.0",

@@ -1,12 +1,16 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 from remotecv.detectors.face_detector import FaceDetector
 from remotecv.detectors.feature_detector import FeatureDetector
 from remotecv.detectors.glasses_detector import GlassesDetector
 from remotecv.detectors.profile_detector import ProfileDetector
+from remotecv.detectors.complete_detector import CompleteDetector
 
 class ImageProcessor:
     def __init__(self):
         self.detectors = {
+            'all': CompleteDetector(),
             'face': FaceDetector(),
             'feat': FeatureDetector(),
             'glas': GlassesDetector(),

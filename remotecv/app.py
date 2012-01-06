@@ -2,6 +2,8 @@ import bson
 
 from remotecv.image_processor import ImageProcessor
 
+from remotecv.utils import logger
+
 class RemoteCvApp:
 
     def __init__(self):

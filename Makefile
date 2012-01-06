@@ -2,8 +2,8 @@ CC ?= gcc
 
 INCLUDE_DIR = .
 
-CFLAGS += -I$(INCLUDE_DIR) -g -Wall -Werror
-LDFLAGS += -lm -lzmq
+CFLAGS += -I$(INCLUDE_DIR) -Wall -Werror
+LDFLAGS += -lm -lzmq -lopencv_core -lopencv_objdetect -lopencv_imgproc -ltbb
 
 OBJ_DIR = obj
 BIN_DIR = bin
@@ -15,7 +15,9 @@ OBJ = $(OBJ_DIR)/remotecv_ss.o $(OBJ_DIR)/log_utils.o $(OBJ_DIR)/detector.o \
 	  $(OBJ_DIR)/bson.o $(OBJ_DIR)/image_data.o
 
 ifndef DEBUG
-	CFLAGS += -O3
+	CFLAGS += -m64 -march=core2 -mfpmath=sse -O3
+else
+	CFLAGS += -g
 endif
 
 $(BIN_DIR)/remotecv_ss: $(OBJ)

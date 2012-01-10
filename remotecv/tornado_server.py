@@ -23,6 +23,8 @@ class RemoteCvTornadoApp(Application):
 
 def run_server(host, port):
     application = RemoteCvTornadoApp()
+    if host == '*':
+        host = '0.0.0.0'
 
     logger.debug('listening to connections at http://%s:%d' % (host, port))
 

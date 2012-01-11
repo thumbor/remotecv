@@ -12,15 +12,16 @@ import sys
 import argparse
 import logging
 
+from remotecv.unique_queue import UniqueWorker
+
 def main(params=None):
     if params is None:
         params = sys.argv[1:]
     parser = argparse.ArgumentParser(description='Runs RemoteCV.')
 
     conn_group = parser.add_argument_group('Connection arguments')
-    conn_group.add_argument('-b', '--bind', default='*', help='IP address to bind')
-    conn_group.add_argument('-p', '--port', default=13337, type=int, help='Port to listen')
-    conn_group.add_argument('-s', '--server-type', default='zmq', choices=['zmq', 'tornado'], help="Server type")
+    conn_group.add_argument('--host', default='localhost', help='Redis host')
+    conn_group.add_argument('-p', '--port', default=6379, type=int, help='Redis port')
 
     other_group = parser.add_argument_group('Other arguments')
     other_group.add_argument('-l', '--level', default='debug', help='Logging level')
@@ -28,8 +29,7 @@ def main(params=None):
     arguments = parser.parse_args(params)
     logging.basicConfig(level=getattr(logging, arguments.level.upper()))
 
-    server_module = __import__("%s_server" % arguments.server_type)
-    server_module.run_server(arguments.bind, arguments.port)
+    UniqueWorker.run(['Detect'], server="%s:%s" % (arguments.host, arguments.port))
 
 
 if __name__ == "__main__":

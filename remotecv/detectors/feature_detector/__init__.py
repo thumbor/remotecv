@@ -14,17 +14,18 @@ from remotecv.detectors import BaseDetector
 
 class FeatureDetector(BaseDetector):
 
-    def detect(self, width, height, mode, img_data):
-        sz = (width, height)
-        image = cv.CreateImageHeader(sz, cv.IPL_DEPTH_8U, 3)
-        cv.SetData(image, img_data)
+    def detect(self, img_buffer):
+        buffer_len = len(img_buffer)
+        imagefiledata = cv.CreateMatHeader(1, buffer_len, cv.CV_8UC1)
+        cv.SetData(imagefiledata, img_buffer, buffer_len)
+        image = cv.DecodeImage(imagefiledata, cv.CV_LOAD_IMAGE_COLOR)
+
+        sz = cv.GetSize(image)
 
         gray_image = cv.CreateImage(sz, 8, 1);
-        convert_mode = getattr(cv, 'CV_%s2GRAY' % mode)
-        cv.CvtColor(image, gray_image, convert_mode)
+        cv.CvtColor(image, gray_image, cv.CV_BGR2GRAY)
         image = gray_image
-        rows = sz[0]
-        cols = sz[1]
+        rows, cols = sz
 
         eig_image = cv.CreateMat(rows, cols, cv.CV_32FC1)
         temp_image = cv.CreateMat(rows, cols, cv.CV_32FC1)

@@ -10,4 +10,8 @@
 
 import logging
 
+class Config:
+    pass
+
 logger = logging.getLogger('remotecv')
+config = Config()

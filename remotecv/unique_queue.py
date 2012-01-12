@@ -6,7 +6,7 @@ class UniqueQueue(ResQ):
         return value.replace(" ", "").replace("\n", "")
 
     def _create_unique_key(self, queue, args):
-        key = "_".join(args)
+        key = "_".join([str(arg) for arg in args])
         return "resque:unique:queue:%s:%s" % (queue, self._escape_for_key(str(key)))
 
     def add_unique_key(self, queue, args):

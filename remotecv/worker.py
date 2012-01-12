@@ -13,6 +13,7 @@ import argparse
 import logging
 
 from remotecv.unique_queue import UniqueWorker
+from remotecv.utils import config
 
 def main(params=None):
     if params is None:
@@ -28,6 +29,9 @@ def main(params=None):
 
     arguments = parser.parse_args(params)
     logging.basicConfig(level=getattr(logging, arguments.level.upper()))
+
+    config.redis_host = arguments.host
+    config.redis_port = arguments.port
 
     UniqueWorker.run(['Detect'], server="%s:%s" % (arguments.host, arguments.port))
 

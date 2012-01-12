@@ -21,8 +21,8 @@ class FaceDetector(CascadeLoaderDetector):
         top = max(0, top - height * HAIR_OFFSET)
         return top
 
-    def detect(self, img_buffer):
-        features = self.get_features(img_buffer)
+    def detect(self, image):
+        features = self.get_features(image)
 
         points = []
         if features:

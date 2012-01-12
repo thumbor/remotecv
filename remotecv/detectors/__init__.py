@@ -33,26 +33,12 @@ class CascadeLoaderDetector(BaseDetector):
         ratio = max(20, ratio)
         return (ratio, ratio)
 
-    def get_features(self, img_buffer):
-
-        buffer_len = len(img_buffer)
-        imagefiledata = cv.CreateMatHeader(1, buffer_len, cv.CV_8UC1)
-        cv.SetData(imagefiledata, img_buffer, buffer_len)
-        image = cv.DecodeImage(imagefiledata, cv.CV_LOAD_IMAGE_COLOR)
-
-        sz = cv.GetSize(image)
-
-        gray = cv.CreateImage(sz, 8, 1)
-        cv.CvtColor(image, gray, cv.CV_BGR2GRAY)
-
-        # min_size = (20, 20)
-        min_size = self.get_min_size_for(sz)
+    def get_features(self, image):
+        min_size = self.get_min_size_for(image.size())
         haar_scale = 1.2
         min_neighbors = 1
 
-        cv.EqualizeHist(gray, gray)
-
-        faces = cv.HaarDetectObjects(gray,
+        faces = cv.HaarDetectObjects(image.image,
                                      self.__class__.cascade, cv.CreateMemStorage(0),
                                      haar_scale, min_neighbors,
                                      cv.CV_HAAR_DO_CANNY_PRUNING, min_size)
@@ -72,8 +58,8 @@ class CascadeLoaderDetector(BaseDetector):
 
         return faces_scaled
 
-    def detect(self, img_buffer):
-        features = self.get_features(img_buffer)
+    def detect(self, image):
+        features = self.get_features(image)
 
         if features:
             points = [[left, top, width, height] for (left, top, width, height), neighbors in features]

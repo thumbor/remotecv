@@ -34,7 +34,7 @@ class CascadeLoaderDetector(BaseDetector):
         return (ratio, ratio)
 
     def get_features(self, image):
-        min_size = self.get_min_size_for(image.size())
+        min_size = self.get_min_size_for(image.size)
         haar_scale = 1.2
         min_neighbors = 1
 

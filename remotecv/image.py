@@ -1,42 +1,36 @@
 import cv
 
 class Image:
-    def __init__(self, img_buffer):
-        buffer_len = len(img_buffer)
-        imagefiledata = cv.CreateMatHeader(1, buffer_len, cv.CV_8UC1)
-        cv.SetData(imagefiledata, img_buffer, buffer_len)
-        self.image = cv.DecodeImage(imagefiledata, cv.CV_LOAD_IMAGE_COLOR)
+    @classmethod
+    def create_from_raw_bytes(cls, size, mode, img_data):
+        instance = cls()
+        instance.set_image_data(size, mode, img_data)
+        return instance
 
-    def size(self):
-        return cv.GetSize(self.image)
+    @classmethod
+    def create_from_buffer(cls, image_buffer):
+        instance = cls()
+        instance.set_image_buffer(image_buffer)
+        return instance
+
+    def set_image_buffer(self, image_buffer):
+        buffer_len = len(image_buffer)
+        imagefiledata = cv.CreateMatHeader(1, buffer_len, cv.CV_8UC1)
+        cv.SetData(imagefiledata, image_buffer, buffer_len)
+        self.image = cv.DecodeImage(imagefiledata, cv.CV_LOAD_IMAGE_COLOR)
+        self.size = cv.GetSize(self.image)
+        self.mode = "BGR"
+
+    def set_image_raw_data(self, size, mode, img_data):
+        self.image = cv.CreateImageHeader(size, cv.IPL_DEPTH_8U, 3)
+        cv.SetData(self.image, img_data)
+        self.mode = mode
+        self.size = size
 
     def grayscale(self):
-        gray = cv.CreateImage(self.size(), cv.IPL_DEPTH_8U, 1)
-        cv.CvtColor(self.image, gray, cv.CV_BGR2GRAY)
+        convert_mode = getattr(cv, 'CV_%s2GRAY' % self.mode)
+
+        gray = cv.CreateImage(self.size, cv.IPL_DEPTH_8U, 1)
+        cv.CvtColor(self.image, gray, convert_mode)
         cv.EqualizeHist(gray, gray)
         self.image = gray
-
-    def crop(self, left, top, right, bottom):
-        if left == 0 and top == 0 and right == 0 and bottom == 0:
-            return
-
-        limit = lambda dimension, maximum: min(max(dimension, 0), maximum)
-        width, height = self.size()
-
-        left = limit(left, width)
-        top = limit(top, height)
-        right = limit(right, width)
-        bottom = limit(bottom, height)
-
-        if left >= right or top >= bottom:
-            return
-
-        new_width = right - left
-        new_height = bottom - top
-
-        cropped = cv.CreateImage((new_width, new_height), cv.IPL_DEPTH_8U, self.image.nChannels)
-
-        src_region = cv.GetSubRect(self.image, (left, top, new_width, new_height))
-        cv.Copy(src_region, cropped)
-
-        self.image = cropped

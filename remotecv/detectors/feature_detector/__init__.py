@@ -15,7 +15,7 @@ from remotecv.detectors import BaseDetector
 class FeatureDetector(BaseDetector):
 
     def detect(self, image):
-        rows, cols = image.size()
+        rows, cols = image.size
 
         eig_image = cv.CreateMat(rows, cols, cv.CV_32FC1)
         temp_image = cv.CreateMat(rows, cols, cv.CV_32FC1)

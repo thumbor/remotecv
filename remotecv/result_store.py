@@ -2,7 +2,7 @@ import json
 
 import redis
 
-from remotecv.utils import config
+from remotecv.utils import config, logger
 
 class ResultStore:
 
@@ -22,4 +22,6 @@ class ResultStore:
         return result
 
     def store(self, key, points):
-        self.storage.set(key, json.dumps([self.to_dict(point) for point in points]))
+        points_map = [self.to_dict(point) for point in points]
+        logger.debug("Points found: %s" % str(points_map))
+        self.storage.set("thumbor-detector-%s" % key, json.dumps(points_map))

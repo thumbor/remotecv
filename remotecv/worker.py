@@ -12,7 +12,8 @@ import sys
 import argparse
 import logging
 
-from remotecv.unique_queue import UniqueWorker
+from pyremotecv.unique_queue import UniqueWorker
+
 from remotecv.utils import config
 
 def import_module(name):

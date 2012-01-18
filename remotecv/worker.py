@@ -15,6 +15,12 @@ import logging
 from remotecv.unique_queue import UniqueWorker
 from remotecv.utils import config
 
+def import_module(self, name):
+    module = __import__(name)
+    if '.' in name:
+        module = reduce(getattr, name.split('.')[1:], module)
+    return module
+
 def main(params=None):
     if params is None:
         params = sys.argv[1:]
@@ -26,12 +32,14 @@ def main(params=None):
 
     other_group = parser.add_argument_group('Other arguments')
     other_group.add_argument('-l', '--level', default='debug', help='Logging level')
+    other_group.add_argument('-o', '--loader', default='remotecv.http_loader', help='Loader used')
 
     arguments = parser.parse_args(params)
     logging.basicConfig(level=getattr(logging, arguments.level.upper()))
 
     config.redis_host = arguments.host
     config.redis_port = arguments.port
+    config.loader = import_module(arguments.loader)
 
     UniqueWorker.run(['Detect'], server="%s:%s" % (arguments.host, arguments.port))
 

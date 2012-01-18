@@ -1,4 +1,4 @@
 import urllib2
 
-def load(path):
+def load_sync(path):
     return urllib2.urlopen(path).read()

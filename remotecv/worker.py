@@ -15,7 +15,7 @@ import logging
 from remotecv.unique_queue import UniqueWorker
 from remotecv.utils import config
 
-def import_module(self, name):
+def import_module(name):
     module = __import__(name)
     if '.' in name:
         module = reduce(getattr, name.split('.')[1:], module)

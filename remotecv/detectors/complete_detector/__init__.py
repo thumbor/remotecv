@@ -14,14 +14,14 @@ from remotecv.detectors.feature_detector import FeatureDetector
 
 class CompleteDetector(CascadeLoaderDetector):
 
-    def detect(self, img_buffer):
+    def detect(self, image):
         face_detector = FaceDetector()
         feature_detector = FeatureDetector()
 
         feature_points = []
-        face_points = face_detector.detect(img_buffer)
+        face_points = face_detector.detect(image)
         if not face_points:
             face_points = []
-            feature_points = feature_detector.detect(img_buffer)
+            feature_points = feature_detector.detect(image)
 
         return face_points + feature_points

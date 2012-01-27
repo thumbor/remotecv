@@ -12,6 +12,7 @@ import sys
 import argparse
 import logging
 
+from redis import Redis
 from pyremotecv.unique_queue import UniqueWorker
 
 from remotecv.utils import config
@@ -29,7 +30,8 @@ def main(params=None):
 
     conn_group = parser.add_argument_group('Connection arguments')
     conn_group.add_argument('--host', default='localhost', help='Redis host')
-    conn_group.add_argument('-p', '--port', default=6379, type=int, help='Redis port')
+    conn_group.add_argument('--port', default=6379, type=int, help='Redis port')
+    conn_group.add_argument('--password', default=None, help='Redis password')
 
     other_group = parser.add_argument_group('Other arguments')
     other_group.add_argument('-l', '--level', default='debug', help='Logging level')
@@ -42,7 +44,8 @@ def main(params=None):
     config.redis_port = arguments.port
     config.loader = import_module(arguments.loader)
 
-    UniqueWorker.run(['Detect'], server="%s:%s" % (arguments.host, arguments.port))
+    redis = Redis(host=arguments.host, port=arguments.port, password=arguments.password)
+    UniqueWorker.run(['Detect'], redis)
 
 
 if __name__ == "__main__":

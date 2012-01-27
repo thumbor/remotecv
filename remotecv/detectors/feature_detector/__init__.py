@@ -19,7 +19,7 @@ class FeatureDetector(BaseDetector):
 
         eig_image = cv.CreateMat(rows, cols, cv.CV_32FC1)
         temp_image = cv.CreateMat(rows, cols, cv.CV_32FC1)
-        points = cv.GoodFeaturesToTrack(image, eig_image, temp_image, 20, 0.04, 1.0, useHarris = False)
+        points = cv.GoodFeaturesToTrack(image.image, eig_image, temp_image, 20, 0.04, 1.0, useHarris = False)
 
         if points:
             return [[x, y, 1, 1] for x, y in points]

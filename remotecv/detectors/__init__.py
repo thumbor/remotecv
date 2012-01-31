@@ -36,7 +36,7 @@ class CascadeLoaderDetector(BaseDetector):
     def get_features(self, image):
         min_size = self.get_min_size_for(image.size)
         haar_scale = 1.2
-        min_neighbors = 1
+        min_neighbors = 4
 
         faces = cv.HaarDetectObjects(image.image,
                                      self.__class__.cascade, cv.CreateMemStorage(0),

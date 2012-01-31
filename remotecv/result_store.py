@@ -1,14 +1,11 @@
 import json
 
-import redis
-
-from remotecv.utils import config, logger
+from remotecv.utils import logger
 
 class ResultStore:
 
-    def __init__(self):
-        self.storage = redis.Redis(port=config.redis_port,
-                                   host=config.redis_host)
+    def __init__(self, redis):
+        self.storage = redis
 
     def to_dict(self, points):
         result = {

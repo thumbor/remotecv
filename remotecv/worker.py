@@ -36,6 +36,7 @@ def main(params=None):
     other_group = parser.add_argument_group('Other arguments')
     other_group.add_argument('-l', '--level', default='debug', help='Logging level')
     other_group.add_argument('-o', '--loader', default='remotecv.http_loader', help='Loader used')
+    other_group.add_argument('-t', '--timeout', default=None, type=int, help='Timeout in seconds for image detection')
 
     arguments = parser.parse_args(params)
     logging.basicConfig(level=getattr(logging, arguments.level.upper()))
@@ -45,7 +46,7 @@ def main(params=None):
     config.loader = import_module(arguments.loader)
 
     redis = Redis(host=arguments.host, port=arguments.port, password=arguments.password)
-    UniqueWorker.run(['Detect'], redis)
+    UniqueWorker.run(['Detect'], redis, timeout=arguments.timeout)
 
 
 if __name__ == "__main__":

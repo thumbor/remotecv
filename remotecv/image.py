@@ -10,8 +10,14 @@ class Image:
     @classmethod
     def create_from_buffer(cls, image_buffer):
         instance = cls()
+        if not instance.is_valid(image_buffer):
+            return None
+
         instance.set_image_buffer(image_buffer)
         return instance
+
+    def is_valid(self, image_buffer):
+        return len(image_buffer) > 4 and image_buffer[:4] != 'GIF8'
 
     def set_image_buffer(self, image_buffer):
         buffer_len = len(image_buffer)

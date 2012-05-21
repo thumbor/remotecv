@@ -24,5 +24,8 @@ class ImageProcessor:
             return None
 
         image = Image.create_from_buffer(image_data)
+        if image is None:
+            return []
+
         image.grayscale()
         return detector.detect(image)

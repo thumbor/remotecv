@@ -19,9 +19,11 @@ class CompleteDetector(CascadeLoaderDetector):
         feature_detector = FeatureDetector()
 
         feature_points = []
-        face_points = face_detector.detect(image)
+
+        face_points = face_detector.detect(image) or []
+
         if not face_points:
-            face_points = []
-            feature_points = feature_detector.detect(image)
+            feature_points = feature_detector.detect(image) or []
 
         return face_points + feature_points
+

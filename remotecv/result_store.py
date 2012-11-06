@@ -2,7 +2,10 @@ import json
 
 from remotecv.utils import logger
 
+
 class ResultStore:
+
+    WEEK = 604800
 
     def __init__(self, redis):
         self.storage = redis
@@ -21,4 +24,5 @@ class ResultStore:
     def store(self, key, points):
         points_map = [self.to_dict(point) for point in points]
         logger.debug("Points found: %s" % str(points_map))
-        self.storage.set("thumbor-detector-%s" % key, json.dumps(points_map))
+        redis_key = "thumbor-detector-%s" % key
+        self.storage.setex(redis_key, json.dumps(points_map), 2 * self.WEEK)

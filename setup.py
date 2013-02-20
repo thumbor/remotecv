@@ -14,9 +14,9 @@ from remotecv import __version__
 setup(
     name = 'remotecv',
     version = __version__,
-    description = "remotecv is an OpenCV server for facial and feature recognition",
+    description = "remotecv is an OpenCV worker for facial and feature recognition",
     long_description = """
-remotecv is an OpenCV server for facial and feature recognition
+remotecv is an OpenCV worker for facial and feature recognition
 """,
     keywords = 'imaging face detection feature opencv',
     author = 'globo.com',

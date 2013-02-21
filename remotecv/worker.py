@@ -30,7 +30,7 @@ def start_pyres_worker():
 def start_celery_worker():
     from remotecv.celery_tasks import CeleryTasks
 
-    celery_tasks = CeleryTasks(config.key_id, config.key_secret, config.region, config.timeout)
+    celery_tasks = CeleryTasks(config.key_id, config.key_secret, config.region, config.timeout, config.polling_interval)
     celery_tasks.run_commands(config.extra_args, log_level=config.log_level)
 
 def main(params=None):
@@ -50,6 +50,7 @@ def main(params=None):
     conn_group.add_argument('--region', default='us-east-1', help='AWS SQS Region')
     conn_group.add_argument('--key_id', default='', help='AWS access key id')
     conn_group.add_argument('--key_secret', default='', help='AWS access key secret')
+    conn_group.add_argument('--polling_interval', default=20, help='AWS polling interval')
 
     other_group = parser.add_argument_group('Other arguments')
     other_group.add_argument('-l', '--level', default='debug', help='Logging level')
@@ -69,6 +70,7 @@ def main(params=None):
     config.region = arguments.region
     config.key_id = arguments.key_id
     config.key_secret = arguments.key_secret
+    config.polling_interval = arguments.polling_interval
 
     config.timeout = arguments.timeout
     config.log_level = arguments.level.upper()

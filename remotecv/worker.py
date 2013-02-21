@@ -24,13 +24,14 @@ def import_module(name):
 
 def start_pyres_worker():
     from pyremotecv.unique_queue import UniqueWorker
-    UniqueWorker.run(['Detect'], config.redis, timeout=config.timeout)
+    redis = Redis(host=config.redis_host, port=config.redis_port, password=config.redis_password)
+    UniqueWorker.run(['Detect'], redis, timeout=config.timeout)
 
 def start_celery_worker():
-    from remotecv.celery_config import init_celery
+    from remotecv.celery_tasks import CeleryTasks
 
-    celery, detect_task = init_celery(config.key_id, config.key_secret, config.region, config.timeout)
-    celery.start(config.extra_args)
+    celery_tasks = CeleryTasks(config.key_id, config.key_secret, config.region, config.timeout)
+    celery_tasks.run_commands(config.extra_args, log_level=config.log_level)
 
 def main(params=None):
     if params is None:
@@ -45,7 +46,7 @@ def main(params=None):
     conn_group.add_argument('--port', default=6379, type=int, help='Redis port')
     conn_group.add_argument('--password', default=None, help='Redis password')
 
-    conn_group = parser.add_argument_group('SQS Connection Arguments')
+    conn_group = parser.add_argument_group('Celery/SQS Connection Arguments')
     conn_group.add_argument('--region', default='us-east-1', help='AWS SQS Region')
     conn_group.add_argument('--key_id', default='', help='AWS access key id')
     conn_group.add_argument('--key_secret', default='', help='AWS access key secret')
@@ -53,6 +54,7 @@ def main(params=None):
     other_group = parser.add_argument_group('Other arguments')
     other_group.add_argument('-l', '--level', default='debug', help='Logging level')
     other_group.add_argument('-o', '--loader', default='remotecv.http_loader', help='Loader used')
+    other_group.add_argument('-s', '--store', default='remotecv.result_store.redis_store', help='Loader used')
     other_group.add_argument('-t', '--timeout', default=None, type=int, help='Timeout in seconds for image detection')
     other_group.add_argument('args', nargs=argparse.REMAINDER)
 
@@ -63,14 +65,15 @@ def main(params=None):
     config.redis_host = arguments.host
     config.redis_port = arguments.port
     config.redis_password = arguments.password
-    config.redis = Redis(host=config.redis_host, port=config.redis_port, password=config.redis_password)
 
     config.region = arguments.region
     config.key_id = arguments.key_id
     config.key_secret = arguments.key_secret
 
     config.timeout = arguments.timeout
+    config.log_level = arguments.level.upper()
     config.loader = import_module(arguments.loader)
+    config.store = import_module(arguments.store)
 
     config.extra_args = sys.argv[:1] + arguments.args
 

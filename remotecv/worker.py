@@ -23,7 +23,7 @@ def import_module(name):
     return module
 
 def start_pyres_worker():
-    from pyremotecv.unique_queue import UniqueWorker
+    from remotecv.unique_queue import UniqueWorker
     redis = Redis(host=config.redis_host, port=config.redis_port, password=config.redis_password)
     UniqueWorker.run(['Detect'], redis, timeout=config.timeout)
 

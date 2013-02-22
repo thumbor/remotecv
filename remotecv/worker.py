@@ -57,7 +57,11 @@ def main(params=None):
     other_group.add_argument('-o', '--loader', default='remotecv.http_loader', help='Loader used')
     other_group.add_argument('-s', '--store', default='remotecv.result_store.redis_store', help='Loader used')
     other_group.add_argument('-t', '--timeout', default=None, type=int, help='Timeout in seconds for image detection')
-    other_group.add_argument('args', nargs=argparse.REMAINDER)
+
+    memcache_store_group = parser.add_argument_group('Memcache store arguments')
+    memcache_store_group.add_argument('--memcache_hosts', default='localhost:11211', help='Comma separated list of memcache hosts')
+
+    parser.add_argument('args', nargs=argparse.REMAINDER)
 
     arguments = parser.parse_args(params)
     logging.basicConfig(level=getattr(logging, arguments.level.upper()))
@@ -76,6 +80,8 @@ def main(params=None):
     config.log_level = arguments.level.upper()
     config.loader = import_module(arguments.loader)
     config.store = import_module(arguments.store)
+
+    config.memcache_hosts = arguments.memcache_hosts
 
     config.extra_args = sys.argv[:1] + arguments.args
 

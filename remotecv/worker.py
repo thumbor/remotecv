@@ -15,6 +15,7 @@ import logging
 from redis import Redis
 
 from remotecv.utils import config
+from remotecv.error_handler import ErrorHandler
 
 def import_module(name):
     module = __import__(name)
@@ -25,7 +26,10 @@ def import_module(name):
 def start_pyres_worker():
     from remotecv.unique_queue import UniqueWorker
     redis = Redis(host=config.redis_host, port=config.redis_port, password=config.redis_password)
-    UniqueWorker.run(['Detect'], redis, timeout=config.timeout)
+    def after_fork(job):
+        config.error_handler.install_handler()
+    worker = UniqueWorker(queues=['Detect'], server=redis, timeout=config.timeout, after_fork=after_fork)
+    worker.work()
 
 def start_celery_worker():
     from remotecv.celery_tasks import CeleryTasks
@@ -57,6 +61,7 @@ def main(params=None):
     other_group.add_argument('-o', '--loader', default='remotecv.http_loader', help='Loader used')
     other_group.add_argument('-s', '--store', default='remotecv.result_store.redis_store', help='Loader used')
     other_group.add_argument('-t', '--timeout', default=None, type=int, help='Timeout in seconds for image detection')
+    other_group.add_argument('--sentry_url', default=None, help='URL used to send errors to sentry')
 
     memcache_store_group = parser.add_argument_group('Memcache store arguments')
     memcache_store_group.add_argument('--memcache_hosts', default='localhost:11211', help='Comma separated list of memcache hosts')
@@ -84,6 +89,8 @@ def main(params=None):
     config.memcache_hosts = arguments.memcache_hosts
 
     config.extra_args = sys.argv[:1] + arguments.args
+
+    config.error_handler = ErrorHandler(arguments.sentry_url)
 
     if arguments.backend == 'pyres':
         start_pyres_worker()

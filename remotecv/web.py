@@ -29,6 +29,7 @@ def main(params=None):
     conn_group = parser.add_argument_group('Redis arguments')
     conn_group.add_argument('--redis-host', default='localhost', help='Redis host')
     conn_group.add_argument('--redis-port', default=6379, type=int, help='Redis port')
+    conn_group.add_argument('--redis-database', default=0, type=int, help='Redis database')
     conn_group.add_argument('--redis-password', default=None, help='Redis password')
 
     other_group = parser.add_argument_group('Other arguments')
@@ -37,7 +38,7 @@ def main(params=None):
     arguments = parser.parse_args(params)
     logging.basicConfig(level=getattr(logging, arguments.level.upper()))
 
-    redis = Redis(host=arguments.redis_host, port=arguments.redis_port, password=arguments.redis_password)
+    redis = Redis(host=arguments.redis_host, port=arguments.redis_port, db=arguments.redis_database, password=arguments.redis_password)
     resweb_server.HOST = ResQ(redis)
     run_itty(host=arguments.host, port=arguments.port, server='wsgiref')
 

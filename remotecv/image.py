@@ -1,4 +1,7 @@
-import cv
+try: 
+    import cv
+except ImportError:
+    import cv2.cv as cv
 
 class Image:
     @classmethod

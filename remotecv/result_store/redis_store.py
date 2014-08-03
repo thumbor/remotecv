@@ -10,7 +10,7 @@ class ResultStore(BaseStore):
 
     def __init__(self, config):
         if not ResultStore.redis_instance:
-            ResultStore.redis_instance = Redis(host=config.redis_host, port=config.redis_port, password=config.redis_password)
+            ResultStore.redis_instance = Redis(host=config.redis_host, port=config.redis_port, db=config.redis_database, password=config.redis_password)
         self.storage = ResultStore.redis_instance
 
     def store(self, key, points):

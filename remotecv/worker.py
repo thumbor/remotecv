@@ -25,7 +25,7 @@ def import_module(name):
 
 def start_pyres_worker():
     from remotecv.unique_queue import UniqueWorker
-    redis = Redis(host=config.redis_host, port=config.redis_port, password=config.redis_password)
+    redis = Redis(host=config.redis_host, port=config.redis_port, db=config.redis_database, password=config.redis_password)
     def after_fork(job):
         config.error_handler.install_handler()
     worker = UniqueWorker(queues=['Detect'], server=redis, timeout=config.timeout, after_fork=after_fork)
@@ -48,6 +48,7 @@ def main(params=None):
     conn_group = parser.add_argument_group('Pyres Connection Arguments')
     conn_group.add_argument('--host', default='localhost', help='Redis host')
     conn_group.add_argument('--port', default=6379, type=int, help='Redis port')
+    conn_group.add_argument('--database', default=0, type=int, help='Redis database')
     conn_group.add_argument('--password', default=None, help='Redis password')
 
     conn_group = parser.add_argument_group('Celery/SQS Connection Arguments')
@@ -74,6 +75,7 @@ def main(params=None):
     config.backend = arguments.backend
     config.redis_host = arguments.host
     config.redis_port = arguments.port
+    config.redis_database = arguments.database
     config.redis_password = arguments.password
 
     config.region = arguments.region

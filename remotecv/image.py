@@ -1,7 +1,16 @@
-try: 
+from io import BytesIO
+
+from PIL import Image as PilImage
+from thumbor.engines import BaseEngine
+from thumbor.engines.pil import FORMATS
+try:
     import cv
 except ImportError:
     import cv2.cv as cv
+
+PilImage.IGNORE_DECODING_ERRORS = True
+PilImage.MAXBLOCK = 2 ** 25
+
 
 class Image:
     @classmethod
@@ -22,7 +31,23 @@ class Image:
     def is_valid(self, image_buffer):
         return len(image_buffer) > 4 and image_buffer[:4] != 'GIF8'
 
+    def parse_image(self, image_buffer):
+        tmp = BytesIO(image_buffer)
+        result = BytesIO()
+        img = PilImage.open(tmp)
+        ext = BaseEngine.get_mimetype(image_buffer)
+        try:
+            img.load()
+        except IOError:
+            pass
+        img.save(result, FORMATS.get(ext, FORMATS['.jpg']))
+        result_bytes = result.getvalue()
+        result.close()
+        tmp.close()
+        return result_bytes
+
     def set_image_buffer(self, image_buffer):
+        image_buffer = self.parse_image(image_buffer)
         buffer_len = len(image_buffer)
         imagefiledata = cv.CreateMatHeader(1, buffer_len, cv.CV_8UC1)
         cv.SetData(imagefiledata, image_buffer, buffer_len)

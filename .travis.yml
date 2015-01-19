@@ -1,0 +1,24 @@
+language: python
+python:
+    - "2.7_with_system_site_packages"
+    - "2.6"
+    - "3.2"
+
+matrix:
+    fast_finish: true
+    allow_failures:
+        - python: "2.6"
+        - python: "3.2"
+
+
+install:
+    - LDFLAGS=-lm sudo aptitude install -y $(< requirements)
+
+    - sudo apt-get autoremove -y
+
+    - df -h
+
+    - make setup
+
+script:
+    - make test

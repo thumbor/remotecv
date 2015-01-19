@@ -12,7 +12,7 @@ matrix:
 
 
 install:
-    - LDFLAGS=-lm sudo aptitude install -y $(< requirements)
+    - LDFLAGS=-lm sudo apt-get install -y $(< requirements)
 
     - sudo apt-get autoremove -y
 

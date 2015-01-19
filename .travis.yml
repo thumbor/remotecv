@@ -16,8 +16,6 @@ install:
 
     - sudo apt-get autoremove -y
 
-    - df -h
-
     - make setup
 
 script:

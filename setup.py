@@ -15,6 +15,7 @@ tests_require = [
     "pyvows",
     "preggy",
     "coverage",
+    "thumbor",
 ]
 
 setup(

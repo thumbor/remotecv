@@ -16,6 +16,7 @@ tests_require = [
     "preggy",
     "coverage",
     "thumbor",
+    "numpy"
 ]
 
 setup(

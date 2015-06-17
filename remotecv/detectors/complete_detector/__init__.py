@@ -21,11 +21,11 @@ class CompleteDetector(CascadeLoaderDetector):
         face_detector = FaceDetector()
         glasses_detector = GlassesDetector()
         profile_detector = ProfileDetector()
+        feature_detector = FeatureDetector()
 
         face_points = face_detector.detect(image) or []
         glasses_points = glasses_detector.detect(image) or []
         profile_points = profile_detector.detect(image) or []
         feature_points = feature_detector.detect(image) or []
-
 
         return face_points + glasses_points + profile_points + feature_points

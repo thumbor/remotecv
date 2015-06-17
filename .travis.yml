@@ -12,6 +12,7 @@ matrix:
 
 
 install:
+    - sudo apt-get update
     - LDFLAGS=-lm sudo apt-get install --fix-missing -y $(< requirements)
 
     - sudo apt-get autoremove -y

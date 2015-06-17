@@ -12,6 +12,7 @@ from remotecv.detectors import CascadeLoaderDetector
 from remotecv.detectors.face_detector import FaceDetector
 from remotecv.detectors.glasses_detector import GlassesDetector
 from remotecv.detectors.profile_detector import ProfileDetector
+from remotecv.detectors.feature_detector import FeatureDetector
 
 
 class CompleteDetector(CascadeLoaderDetector):
@@ -24,5 +25,7 @@ class CompleteDetector(CascadeLoaderDetector):
         face_points = face_detector.detect(image) or []
         glasses_points = glasses_detector.detect(image) or []
         profile_points = profile_detector.detect(image) or []
+        feature_points = feature_detector.detect(image) or []
 
-        return face_points + glasses_points + profile_points
+
+        return face_points + glasses_points + profile_points + feature_points

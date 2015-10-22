@@ -1,5 +1,5 @@
 setup:
-	@pip install -e.\[tests\]
+	@pip install -Ue.\[tests\]
 
 test:
-	@pyvows -vv --profile --cover --cover-package=remotecv
+	@coverage run --branch `which nosetests` -v --with-yanc -s tests/

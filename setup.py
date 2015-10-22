@@ -12,11 +12,12 @@ from setuptools import setup, find_packages
 from remotecv import __version__
 
 tests_require = [
-    "pyvows",
+    "nose",
     "preggy",
     "coverage",
     "thumbor",
-    "numpy"
+    "numpy",
+    "yanc",
 ]
 
 setup(

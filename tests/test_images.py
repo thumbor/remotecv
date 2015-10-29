@@ -16,3 +16,8 @@ class ImageTest(TestCase):
         im = Image.create_from_buffer(read_fixture('broken.jpg'))
         expect(im.image).Not.to_be_null()
         expect(im.size).to_equal((600, 769))
+
+    def test_when_image_is_pallete(self):
+        im = Image.create_from_buffer(read_fixture('pallete.png'))
+        expect(im.image).Not.to_be_null()
+        expect(im.size).to_equal((3317, 2083))

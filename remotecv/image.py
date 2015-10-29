@@ -40,6 +40,8 @@ class Image:
             img.load()
         except IOError:
             pass
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
         img.save(result, FORMATS.get(ext, FORMATS['.jpg']))
         result_bytes = result.getvalue()
         result.close()

@@ -10,12 +10,13 @@
 
 from os.path import join, dirname, abspath, isabs
 
-try:
-    import cv
-except ImportError:
-    import cv2.cv as cv
+import cv2
+import numpy as np
+
 
 class BaseDetector(object):
+    def get_np_img(self, image):
+        return np.array(image)
 
     def detect(self, context):
         raise NotImplementedError()
@@ -29,7 +30,7 @@ class CascadeLoaderDetector(BaseDetector):
                 cascade_file = cascade_file_path
             else:
                 cascade_file = join(abspath(dirname(module_path)), cascade_file_path)
-            setattr(self.__class__, 'cascade', cv.Load(cascade_file))
+            self.__class__.cascade = cv2.CascadeClassifier(cascade_file)
 
     def get_min_size_for(self, size):
         ratio = int(min(size[0], size[1]) / 15)
@@ -37,27 +38,17 @@ class CascadeLoaderDetector(BaseDetector):
         return (ratio, ratio)
 
     def get_features(self, image):
-        min_size = self.get_min_size_for(image.size)
-        haar_scale = 1.2
-        min_neighbors = 4
+        img = self.get_np_img(image)
 
-        faces = cv.HaarDetectObjects(image.image,
-                                     self.__class__.cascade, cv.CreateMemStorage(0),
-                                     haar_scale, min_neighbors,
-                                     cv.CV_HAAR_DO_CANNY_PRUNING, min_size)
-
+        faces = self.__class__.cascade.detectMultiScale(
+            img,
+            1.2,
+            2,
+        )
         faces_scaled = []
 
-        for ((x, y, w, h), n) in faces:
-            # the input to cv.HaarDetectObjects was resized, so scale the
-            # bounding box of each face and convert it to two CvPoints
-            pt1 = (x, y)
-            pt2 = ((x + w), (y + h))
-            x1 = pt1[0]
-            x2 = pt2[0]
-            y1 = pt1[1]
-            y2 = pt2[1]
-            faces_scaled.append(((x1, y1, x2-x1, y2-y1), None))
+        for (x, y, w, h) in faces:
+            faces_scaled.append(((x, y, w, h), 0))
 
         return faces_scaled
 

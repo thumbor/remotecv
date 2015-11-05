@@ -23,3 +23,11 @@ class ImageProcessorTest(TestCase):
         image_processor = ImageProcessor()
         detect = image_processor.detect('face', read_fixture('huge_image.jpg'))
         expect(detect).Not.to_be_empty()
+
+    from nose_focus import focus
+    @focus
+    def test_feature_detection(self):
+        image_processor = ImageProcessor()
+        detect = image_processor.detect('feature', read_fixture('broken.jpg'))
+        print detect
+        expect(detect).Not.to_be_empty()

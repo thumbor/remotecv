@@ -4,27 +4,26 @@
 # thumbor imaging service
 # https://github.com/globocom/thumbor/wiki
 
-# Licensed under the MIT license: 
+# Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
-try:
-    import cv
-except ImportError:
-    import cv2.cv as cv
+import cv2
 
 from remotecv.detectors import BaseDetector
+
 
 class FeatureDetector(BaseDetector):
 
     def detect(self, image):
-        rows, cols = image.size
+        points = cv2.goodFeaturesToTrack(
+            self.get_np_img(image),
+            maxCorners=20,
+            qualityLevel=0.04,
+            minDistance=1.0,
+            useHarrisDetector=False)
 
-        eig_image = cv.CreateMat(rows, cols, cv.CV_32FC1)
-        temp_image = cv.CreateMat(rows, cols, cv.CV_32FC1)
-        points = cv.GoodFeaturesToTrack(image.image, eig_image, temp_image, 20, 0.04, 1.0, useHarris = False)
-
-        if points:
-            return [[x, y, 1, 1] for x, y in points]
+        if points.any():
+            return [[point[0][0], point[0][1], 1, 1] for point in points]
 
         return None

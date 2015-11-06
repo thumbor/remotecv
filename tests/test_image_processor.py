@@ -15,7 +15,7 @@ class ImageProcessorTest(TestCase):
 
     def test_when_image_is_huge(self):
         image_processor = ImageProcessor()
-        detect = image_processor.detect('face', read_fixture('huge_image.jpg'))
+        detect = image_processor.detect('all', read_fixture('huge_image.jpg'))
         expect(detect).Not.to_be_empty()
 
     def test_when_not_animated_gif(self):

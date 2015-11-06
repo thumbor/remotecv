@@ -8,7 +8,7 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
-from os.path import join, dirname, abspath, isabs
+from os.path import join, dirname, abspath
 
 import cv2
 import numpy as np
@@ -25,10 +25,6 @@ class BaseDetector(object):
 class CascadeLoaderDetector(BaseDetector):
 
     def load_cascade_file(self, module_path, cascade_file_path):
-        # if not hasattr(self.__class__, 'cascade'):
-        #     if isabs(cascade_file_path):
-        #         cascade_file = cascade_file_path
-        #     else:
         cascade_file = join(abspath(dirname(module_path)), cascade_file_path)
         self.__class__.cascade = cv2.CascadeClassifier(cascade_file)
 
@@ -37,8 +33,8 @@ class CascadeLoaderDetector(BaseDetector):
 
         faces = self.__class__.cascade.detectMultiScale(
             img,
-            1.2,
-            2,
+            1.7,
+            1,
         )
         faces_scaled = []
 

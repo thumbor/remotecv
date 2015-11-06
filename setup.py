@@ -15,9 +15,10 @@ tests_require = [
     "nose",
     "preggy",
     "coverage",
-    "thumbor",
     "numpy",
     "yanc",
+    "nose-focus",
+    "mock",
 ]
 
 setup(

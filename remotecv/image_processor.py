@@ -28,5 +28,4 @@ class ImageProcessor:
         if image is None:
             return []
 
-        image.grayscale()
         return detector.detect(image)

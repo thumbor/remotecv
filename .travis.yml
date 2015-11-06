@@ -19,6 +19,7 @@ addons:
     - python-opencv
 
 install:
+  - pip install coveralls
   - make setup
 
 script:

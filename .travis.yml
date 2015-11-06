@@ -1,22 +1,24 @@
 language: python
 python:
-    - "2.7_with_system_site_packages"
-    - "2.6"
-    - "3.2"
-
+  - 2.7_with_system_site_packages
+  - '3.2'
+  - pypy
+cache:
+  directories:
+    - $HOME/.cache/pip
+sudo: false
 matrix:
-    fast_finish: true
-    allow_failures:
-        - python: "2.6"
-        - python: "3.2"
-
+  fast_finish: true
+  allow_failures:
+    - python: '3.2'
+    - python: pypy
+addons:
+  apt:
+    packages:
+    - libjpeg-dev
+    - python-opencv
 
 install:
-    - sudo apt-get update
-    - LDFLAGS=-lm sudo apt-get install --fix-missing -y $(< requirements)
-
-    - sudo apt-get autoremove -y
-
     - make setup
 
 script:

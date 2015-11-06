@@ -28,13 +28,19 @@ class CascadeLoaderDetector(BaseDetector):
         cascade_file = join(abspath(dirname(module_path)), cascade_file_path)
         self.__class__.cascade = cv2.CascadeClassifier(cascade_file)
 
+    def get_min_size_for(self, size):
+        ratio = int(min(size[0], size[1]) / 15)
+        ratio = max(20, ratio)
+        return (ratio, ratio)
+
     def get_features(self, image):
         img = self.get_np_img(image)
 
         faces = self.__class__.cascade.detectMultiScale(
             img,
-            1.7,
-            1,
+            1.2,
+            4,
+            minSize=self.get_min_size_for(image.size)
         )
         faces_scaled = []
 

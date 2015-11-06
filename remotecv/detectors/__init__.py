@@ -25,17 +25,12 @@ class BaseDetector(object):
 class CascadeLoaderDetector(BaseDetector):
 
     def load_cascade_file(self, module_path, cascade_file_path):
-        if not hasattr(self.__class__, 'cascade'):
-            if isabs(cascade_file_path):
-                cascade_file = cascade_file_path
-            else:
-                cascade_file = join(abspath(dirname(module_path)), cascade_file_path)
-            self.__class__.cascade = cv2.CascadeClassifier(cascade_file)
-
-    def get_min_size_for(self, size):
-        ratio = int(min(size[0], size[1]) / 15)
-        ratio = max(20, ratio)
-        return (ratio, ratio)
+        # if not hasattr(self.__class__, 'cascade'):
+        #     if isabs(cascade_file_path):
+        #         cascade_file = cascade_file_path
+        #     else:
+        cascade_file = join(abspath(dirname(module_path)), cascade_file_path)
+        self.__class__.cascade = cv2.CascadeClassifier(cascade_file)
 
     def get_features(self, image):
         img = self.get_np_img(image)

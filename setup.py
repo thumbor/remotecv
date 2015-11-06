@@ -18,6 +18,7 @@ tests_require = [
     "numpy",
     "yanc",
     "nose-focus",
+    "mock",
 ]
 
 setup(

@@ -14,16 +14,16 @@ from remotecv.detectors import BaseDetector
 
 
 class FeatureDetector(BaseDetector):
-
     def detect(self, image):
         points = cv2.goodFeaturesToTrack(
             self.get_np_img(image),
             maxCorners=20,
             qualityLevel=0.04,
             minDistance=1.0,
-            useHarrisDetector=False)
+            useHarrisDetector=False,
+        )
 
-        if points.any():
+        if points is not None and len(points) > 0:
             return [[point[0][0], point[0][1], 1, 1] for point in points]
 
         return None

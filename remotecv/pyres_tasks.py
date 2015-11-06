@@ -1,6 +1,7 @@
 from remotecv.image_processor import ImageProcessor
 from remotecv.utils import config, logger
 
+
 class DetectTask:
     queue = "Detect"
     processor = ImageProcessor()

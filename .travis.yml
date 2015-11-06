@@ -19,7 +19,9 @@ addons:
     - python-opencv
 
 install:
-    - make setup
+  - make setup
 
 script:
-    - make test
+  - make test
+after_success:
+  coveralls

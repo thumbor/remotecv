@@ -24,6 +24,6 @@ class FeatureDetector(BaseDetector):
         )
 
         if points is not None and len(points) > 0:
-            return [[point[0][0], point[0][1], 1, 1] for point in points]
+            return [[point[0][0].item(), point[0][1].item(), 1, 1] for point in points]
 
         return None

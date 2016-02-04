@@ -18,6 +18,14 @@ class ImageProcessorTest(TestCase):
         detect = image_processor.detect('all', read_fixture('huge_image.jpg'))
         expect(detect).Not.to_be_empty()
 
+    def test_with_multiple_detectors(self):
+        image_processor = ImageProcessor()
+        detect = image_processor.detect(
+            'face+profile+glass',
+            read_fixture('one_face.gif')
+        )
+        expect(detect).Not.to_be_empty()
+
     def test_when_not_animated_gif(self):
         image_processor = ImageProcessor()
         detect = image_processor.detect('face', read_fixture('one_face.gif'))

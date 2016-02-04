@@ -6,6 +6,7 @@ from remotecv.detectors.feature_detector import FeatureDetector
 from remotecv.detectors.glasses_detector import GlassesDetector
 from remotecv.detectors.profile_detector import ProfileDetector
 from remotecv.detectors.complete_detector import CompleteDetector
+
 from remotecv.image import Image
 
 
@@ -20,12 +21,14 @@ class ImageProcessor:
         }
 
     def detect(self, detector, image_data):
-        detector = self.detectors.get(detector, None)
-        if detector is None:
-            raise AttributeError('Detector unavailable')
-
+        result = []
         image = Image.create_from_buffer(image_data)
         if image is None:
             return []
 
-        return detector.detect(image)
+        for detector_key in detector.split('+'):
+            try:
+                result = result + self.detectors[detector_key].detect(image)
+            except KeyError:
+                raise AttributeError('Detector unavailable')
+        return result

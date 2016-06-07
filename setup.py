@@ -59,8 +59,7 @@ remotecv is an OpenCV worker for facial and feature recognition
 
     entry_points={
         'console_scripts': [
-            'remotecv = remotecv.worker:main',
-            'remotecv-web = remotecv.web:main'
+            'remotecv = remotecv.worker:main'
         ],
     }
 )

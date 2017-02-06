@@ -19,6 +19,7 @@ tests_require = [
     "yanc",
     "nose-focus",
     "mock",
+    "opencv-python",
 ]
 
 setup(

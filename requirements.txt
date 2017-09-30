@@ -1,4 +1,3 @@
 coveralls
-preggy
 argparse>=1.2.1,<1.3.0
 pyres>=1.2,<1.3

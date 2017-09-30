@@ -4,6 +4,8 @@ python:
   - "2.7"
   - "3.6"
   - "nightly" # currently points to 3.7-dev
+group: 
+  - "stable"
 
 cache:
   directories:
@@ -37,7 +39,7 @@ install:
   - python setup.py test
   
 script: 
-  - python helpTest.py | grep Bat-beltfg
+  - python helpTest.py | grep remotecv
   
 after_success:
   - coveralls

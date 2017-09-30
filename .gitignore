@@ -14,3 +14,4 @@ tests/visual_test/build
 build
 *.so
 .ropeproject/
+message.txt

@@ -1,28 +1,53 @@
-language: python
+os:
+  - linux
 python:
-  - 2.7_with_system_site_packages
-  - '3.2'
-  - pypy
+  - "2.7"
+  - "3.6"
+  - "nightly" # currently points to 3.7-dev
+
 cache:
   directories:
     - $HOME/.cache/pip
-sudo: false
 matrix:
   fast_finish: true
-  allow_failures:
-    - python: '3.2'
-    - python: pypy
+  
+dist: trusty
+sudo: required
+language: python
 addons:
   apt:
     packages:
     - libjpeg-dev
     - python-opencv
 
-install:
-  - pip install coveralls
-  - make setup
+before_install:
+  # Show build setup
+  - uname -a
+  - cat /etc/os-release
+  - pwd
+  - free -tm
+  - python --version
+  - git --version
+  - pip install -r requirements.txt
 
-script:
-  - make test
+install:
+  # git describe requires complete history
+  # - travis_retry git fetch --unshallow
+  - python setup.py install
+  - python setup.py test
+  
+script: 
+  - python helpTest.py | grep Bat-beltfg
+  
 after_success:
-  coveralls
+  - coveralls
+  - echo "OK, all done."
+
+notifications:
+  email:
+    recipients:
+      - ralic.lo.eng@ieee.org
+    on_success: always # default: change
+    on_failure: never # default: always
+
+

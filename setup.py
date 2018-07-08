@@ -53,7 +53,7 @@ remotecv is an OpenCV worker for facial and feature recognition
     },
 
     install_requires=[
-        "argparse>=1.2.1,<1.3.0",
+        "argparse>=1.2.1,<1.5.0",
         "pyres>=1.5,<1.6",
         "Pillow>=4.3.0,<5.2.0",
     ],

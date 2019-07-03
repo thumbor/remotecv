@@ -25,4 +25,8 @@ class ResultStore(BaseStore):
         result = self.serialize(points)
         logger.debug("Points found: %s", result)
         redis_key = "thumbor-detector-%s" % key
-        self.storage.setex(redis_key, result, 2 * self.WEEK)
+        self.storage.setex(
+            name=redis_key,
+            value=result,
+            time=2 * self.WEEK,
+        )

@@ -1,18 +1,18 @@
 from celery import Celery
-from pyres_tasks import DetectTask
+
+from remotecv.pyres_tasks import DetectTask
 
 
 class CeleryTasks:
-
     def __init__(self, key_id, key_secret, region, timeout=None, polling_interval=None):
-        self.celery = Celery(broker='sqs://%s:%s@' % (key_id, key_secret))
+        self.celery = Celery(broker="sqs://%s:%s@" % (key_id, key_secret))
 
         self.celery.conf.update(
-            BROKER_TRANSPORT_OPTIONS = {
-                'region': region,
-                'visibility_timeout': timeout or 120,
-                'polling_interval': polling_interval or 20,
-                'queue_name_prefix': 'celery-remotecv-'
+            BROKER_TRANSPORT_OPTIONS={
+                "region": region,
+                "visibility_timeout": timeout or 120,
+                "polling_interval": polling_interval or 20,
+                "queue_name_prefix": "celery-remotecv-",
             }
         )
 

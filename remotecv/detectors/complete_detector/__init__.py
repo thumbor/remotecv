@@ -10,13 +10,12 @@
 
 from remotecv.detectors import CascadeLoaderDetector
 from remotecv.detectors.face_detector import FaceDetector
+from remotecv.detectors.feature_detector import FeatureDetector
 from remotecv.detectors.glasses_detector import GlassesDetector
 from remotecv.detectors.profile_detector import ProfileDetector
-from remotecv.detectors.feature_detector import FeatureDetector
 
 
 class CompleteDetector(CascadeLoaderDetector):
-
     def detect(self, image):
         face_detector = FaceDetector()
         glasses_detector = GlassesDetector()

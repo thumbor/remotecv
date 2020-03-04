@@ -1,7 +1,6 @@
-import pylibmc
-
-from remotecv.utils import logger
 from remotecv.result_store import BaseStore
+from remotecv.utils import logger
+
 
 class ResultStore(BaseStore):
 
@@ -9,21 +8,22 @@ class ResultStore(BaseStore):
     memcache_instance = None
 
     def __init__(self, config):
+        super(ResultStore, self).__init__(config)
+
+        # pylibmc must be imported
+        import pylibmc  # pylint: disable=import-error,import-outside-toplevel
+
         if not ResultStore.memcache_instance:
-            host_strings = config.memcache_hosts.split(',')
+            host_strings = config.memcache_hosts.split(",")
             ResultStore.memcache_instance = pylibmc.Client(
                 host_strings,
                 binary=True,
-                behaviors={
-                    "tcp_nodelay": True,
-                    'no_block': True,
-                    "ketama": True
-                }
+                behaviors={"tcp_nodelay": True, "no_block": True, "ketama": True},
             )
         self.storage = ResultStore.memcache_instance
 
     def store(self, key, points):
         result = self.serialize(points)
-        logger.debug("Points found: %s" % result)
+        logger.debug("Points found: %s", result)
         key = "thumbor-detector-%s" % key
-        self.storage.set(key, result, time=2*self.WEEK)
+        self.storage.set(key, result, time=2 * self.WEEK)

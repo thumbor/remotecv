@@ -1,16 +1,17 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from preggy import expect
 from unittest import TestCase
-from tests import create_image
+
+from preggy import expect
 
 from remotecv.detectors.glasses_detector import GlassesDetector
+from tests import create_image
 
 
 class GlassesDetectorTestCase(TestCase):
     def test_should_detect_glasses(self):
-        detection_result = GlassesDetector().detect(create_image('glasses.jpg'))
+        detection_result = GlassesDetector().detect(create_image("glasses.jpg"))
         expect(detection_result).to_length(2)
         expect(detection_result[0][0]).to_be_numeric()
         expect(detection_result[0][1]).to_be_numeric()

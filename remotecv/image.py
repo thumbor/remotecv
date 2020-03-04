@@ -13,10 +13,9 @@ class Image:
         return instance.parse_image(image_buffer)
 
     def parse_image(self, image_buffer):
-        tmp = BytesIO(image_buffer)
         try:
-            img = PilImage.open(tmp)
-            if hasattr(img, 'is_animated') and img.is_animated:
+            img = PilImage.open(BytesIO(image_buffer))
+            if hasattr(img, "is_animated") and img.is_animated:
                 return None
         except IOError:
             return None
@@ -24,6 +23,4 @@ class Image:
             img.load()
         except IOError:
             pass
-        img = img.convert('L')
-        tmp.close()
         return img

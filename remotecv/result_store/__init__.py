@@ -1,7 +1,7 @@
 import json
 
-class BaseStore(object):
 
+class BaseStore:
     def __init__(self, config):
         self.config = config
 
@@ -9,13 +9,13 @@ class BaseStore(object):
         result_array = []
         for point in points:
             result = {
-                'x': point[0] + (int(point[2]) / 2),
-                'y': point[1] + (int(point[3]) / 2),
-                'height': int(point[2]),
-                'width': int(point[3]),
-                'origin': ''
+                "x": point[0] + (int(point[2]) / 2),
+                "y": point[1] + (int(point[3]) / 2),
+                "height": int(point[2]),
+                "width": int(point[3]),
+                "origin": "",
             }
-            result['z'] = result['width'] * result['height']
+            result["z"] = result["width"] * result["height"]
             result_array.append(result)
 
         return json.dumps(result_array)

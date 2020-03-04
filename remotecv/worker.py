@@ -8,66 +8,108 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
-import sys
 import argparse
 import logging
+import sys
+from importlib import import_module
 
 from redis import Redis
 
-from remotecv.utils import config
 from remotecv.error_handler import ErrorHandler
+from remotecv.utils import config
 
-def import_module(name):
-    module = __import__(name)
-    if '.' in name:
-        module = reduce(getattr, name.split('.')[1:], module)
-    return module
 
 def start_pyres_worker():
-    from remotecv.unique_queue import UniqueWorker
-    redis = Redis(host=config.redis_host, port=config.redis_port, db=config.redis_database, password=config.redis_password)
-    def after_fork(job):
+    from remotecv.unique_queue import (  # NOQA pylint: disable=import-outside-toplevel
+        UniqueWorker,
+    )
+
+    redis = Redis(
+        host=config.redis_host,
+        port=config.redis_port,
+        db=config.redis_database,
+        password=config.redis_password,
+    )
+
+    def after_fork(_):
         config.error_handler.install_handler()
-    worker = UniqueWorker(queues=['Detect'], server=redis, timeout=config.timeout, after_fork=after_fork)
+
+    worker = UniqueWorker(
+        queues=["Detect"], server=redis, timeout=config.timeout, after_fork=after_fork
+    )
     worker.work()
 
-def start_celery_worker():
-    from remotecv.celery_tasks import CeleryTasks
 
-    celery_tasks = CeleryTasks(config.key_id, config.key_secret, config.region, config.timeout, config.polling_interval)
+def start_celery_worker():
+    from remotecv.celery_tasks import (  # NOQA pylint: disable=import-outside-toplevel
+        CeleryTasks,
+    )
+
+    celery_tasks = CeleryTasks(
+        config.key_id,
+        config.key_secret,
+        config.region,
+        config.timeout,
+        config.polling_interval,
+    )
     celery_tasks.run_commands(config.extra_args, log_level=config.log_level)
+
 
 def main(params=None):
     if params is None:
         params = sys.argv[1:]
-    parser = argparse.ArgumentParser(description='Runs RemoteCV.')
+    parser = argparse.ArgumentParser(description="Runs RemoteCV.")
 
-    conn_group = parser.add_argument_group('Worker Backend')
-    conn_group.add_argument('-b', '--backend', default='pyres', choices=['pyres', 'celery'], help='Worker backend')
+    conn_group = parser.add_argument_group("Worker Backend")
+    conn_group.add_argument(
+        "-b",
+        "--backend",
+        default="pyres",
+        choices=["pyres", "celery"],
+        help="Worker backend",
+    )
 
-    conn_group = parser.add_argument_group('Pyres Connection Arguments')
-    conn_group.add_argument('--host', default='localhost', help='Redis host')
-    conn_group.add_argument('--port', default=6379, type=int, help='Redis port')
-    conn_group.add_argument('--database', default=0, type=int, help='Redis database')
-    conn_group.add_argument('--password', default=None, help='Redis password')
+    conn_group = parser.add_argument_group("Pyres Connection Arguments")
+    conn_group.add_argument("--host", default="localhost", help="Redis host")
+    conn_group.add_argument("--port", default=6379, type=int, help="Redis port")
+    conn_group.add_argument("--database", default=0, type=int, help="Redis database")
+    conn_group.add_argument("--password", default=None, help="Redis password")
 
-    conn_group = parser.add_argument_group('Celery/SQS Connection Arguments')
-    conn_group.add_argument('--region', default='us-east-1', help='AWS SQS Region')
-    conn_group.add_argument('--key_id', default='', help='AWS access key id')
-    conn_group.add_argument('--key_secret', default='', help='AWS access key secret')
-    conn_group.add_argument('--polling_interval', default=20, help='AWS polling interval')
+    conn_group = parser.add_argument_group("Celery/SQS Connection Arguments")
+    conn_group.add_argument("--region", default="us-east-1", help="AWS SQS Region")
+    conn_group.add_argument("--key_id", default="", help="AWS access key id")
+    conn_group.add_argument("--key_secret", default="", help="AWS access key secret")
+    conn_group.add_argument(
+        "--polling_interval", default=20, help="AWS polling interval"
+    )
 
-    other_group = parser.add_argument_group('Other arguments')
-    other_group.add_argument('-l', '--level', default='debug', help='Logging level')
-    other_group.add_argument('-o', '--loader', default='remotecv.http_loader', help='Loader used')
-    other_group.add_argument('-s', '--store', default='remotecv.result_store.redis_store', help='Loader used')
-    other_group.add_argument('-t', '--timeout', default=None, type=int, help='Timeout in seconds for image detection')
-    other_group.add_argument('--sentry_url', default=None, help='URL used to send errors to sentry')
+    other_group = parser.add_argument_group("Other arguments")
+    other_group.add_argument("-l", "--level", default="debug", help="Logging level")
+    other_group.add_argument(
+        "-o", "--loader", default="remotecv.http_loader", help="Loader used"
+    )
+    other_group.add_argument(
+        "-s", "--store", default="remotecv.result_store.redis_store", help="Loader used"
+    )
+    other_group.add_argument(
+        "-t",
+        "--timeout",
+        default=None,
+        type=int,
+        help="Timeout in seconds for image detection",
+    )
+    other_group.add_argument(
+        "--sentry_url", default=None, help="URL used to send errors to sentry"
+    )
 
-    memcache_store_group = parser.add_argument_group('Memcache store arguments')
-    memcache_store_group.add_argument('--memcache_hosts', default='localhost:11211', help='Comma separated list of memcache hosts')
+    memcache_store_group = parser.add_argument_group("Memcache store arguments")
+    memcache_store_group.add_argument(
+        "--memcache_hosts",
+        default="localhost:11211",
+        help="Comma separated list of memcache hosts",
+    )
 
-    parser.add_argument('args', nargs=argparse.REMAINDER)
+    parser.add_argument("args", nargs=argparse.REMAINDER)
 
     arguments = parser.parse_args(params)
     logging.basicConfig(level=getattr(logging, arguments.level.upper()))
@@ -94,10 +136,11 @@ def main(params=None):
 
     config.error_handler = ErrorHandler(arguments.sentry_url)
 
-    if arguments.backend == 'pyres':
+    if arguments.backend == "pyres":
         start_pyres_worker()
-    elif arguments.backend == 'celery':
+    elif arguments.backend == "celery":
         start_celery_worker()
+
 
 if __name__ == "__main__":
     main()

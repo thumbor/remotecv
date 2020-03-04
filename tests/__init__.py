@@ -1,10 +1,11 @@
-from os.path import join, dirname
+from os.path import dirname, join
+
 from remotecv.image import Image
 
 
 def read_fixture(path):
-    with open(join(dirname(__file__), 'fixtures', path)) as f:
-        return f.read()
+    with open(join(dirname(__file__), "fixtures", path), "rb") as fixt:
+        return fixt.read()
 
 
 def create_image(path):

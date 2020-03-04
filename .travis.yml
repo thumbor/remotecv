@@ -1,28 +1,41 @@
 language: python
 python:
-  - 2.7_with_system_site_packages
-  - '3.2'
-  - pypy
+- 3.7
+- 3.8
+dist: bionic
 cache:
-  directories:
-    - $HOME/.cache/pip
-sudo: false
+  pip: true
+  apt: true
 matrix:
   fast_finish: true
-  allow_failures:
-    - python: '3.2'
-    - python: pypy
+env:
+  matrix:
+  - UNIT_TEST=1
+  - LINT_TEST=1
+
 addons:
   apt:
     packages:
-    - libjpeg-dev
-    - python-opencv
+      - libjpeg-dev
+      - libgnutls28-dev
+      - libjpeg-progs
+      - libimage-exiftool-perl
+      - gifsicle
+      - scons
+      - python-all-dev
+      - libboost-python-dev
+      - libexiv2-dev
+      - ffmpeg
 
 install:
   - pip install coveralls
-  - make setup
+  - pip install --upgrade pip
+  - pip install poetry
+  - cd $TRAVIS_BUILD_DIR && make setup
+  - pip install coveralls
 
 script:
-  - make test
+  - make ci-test
+
 after_success:
   coveralls

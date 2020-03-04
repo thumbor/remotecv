@@ -9,21 +9,29 @@
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
 import cv2
+import numpy as np
 
 from remotecv.detectors import BaseDetector
+
+# pylint: disable=no-member
 
 
 class FeatureDetector(BaseDetector):
     def detect(self, image):
-        points = cv2.goodFeaturesToTrack(
-            self.get_np_img(image),
-            maxCorners=20,
-            qualityLevel=0.04,
-            minDistance=1.0,
-            useHarrisDetector=False,
-        )
+        img = self.get_np_img(image)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        corners = cv2.goodFeaturesToTrack(gray, 25, 0.01, 10)
+        if corners is None:
+            return None
 
-        if points is not None and len(points) > 0:
-            return [[point[0][0].item(), point[0][1].item(), 1, 1] for point in points]
+        corners = np.int0(corners)
+
+        if corners is not None and len(corners) > 0:
+            points = []
+            for corner in corners:  # pylint: disable=not-an-iterable
+                left, top = corner.ravel()
+                points.append([left, top, 1, 1])
+
+            return points
 
         return None

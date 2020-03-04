@@ -1,13 +1,17 @@
-COVERAGE = $(or $(shell which coverage), $(shell which python-coverage), coverage)
-
 setup:
-	@pip install -Ue.\[tests\]
+	@poetry install
 
-test:
-	@$(COVERAGE) run --branch -m nose -v --with-yanc -s tests/
+run:
+	@poetry run remotecv
 
-coverage:
-	@$(COVERAGE) report -m --fail-under=30
+unit:
+	@poetry run pytest -n `nproc` --cov=remotecv tests/
 
-focus:
-	@$(COVERAGE) run --branch -m nose -vv --with-yanc --logging-level=WARNING --with-focus -i -s tests/
+flake:
+	@poetry run flake8 --config flake8
+
+pylint:
+	@poetry run pylint remotecv tests
+
+ci-test:
+	@if [ "$$LINT_TEST" ]; then $(MAKE) flake; else $(MAKE) unit; fi

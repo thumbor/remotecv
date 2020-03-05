@@ -1,5 +1,9 @@
-setup:
+setup: update-setup
 	@poetry install
+
+update-setup:
+	@if ! test -x "$(command -v dephell)"; then echo 'Error: dephell is not installed. Installing...' && python3 -m pip install "dephell[full]"; fi
+	@dephell deps convert
 
 run:
 	@poetry run remotecv

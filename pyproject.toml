@@ -10,6 +10,7 @@ python = "^3.7"
 pyres = "^1.5"
 Pillow = "^7.0.0"
 opencv-python-headless = "^4.2.0"
+sentry-sdk = "^0.14.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.3.5"
@@ -22,7 +23,6 @@ black = "^19.10b0"
 preggy = "^1.4.4"
 pytest-cov = "^2.8.1"
 celery = "^4.4.1"
-sentry-sdk = "^0.14.2"
 
 [tool.poetry.scripts]
 remotecv = 'remotecv.worker:main'

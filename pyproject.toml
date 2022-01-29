@@ -8,7 +8,7 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.7"
 pyres = "^1.5"
-Pillow = ">=7,<10"
+Pillow = ">=9.0.0"
 opencv-python-headless = "^4.2.0"
 sentry-sdk = "^0.14.2"
 

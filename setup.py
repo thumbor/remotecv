@@ -37,15 +37,15 @@ setup(
     },
     install_requires=[
         'opencv-python-headless==4.*,>=4.2.0', 'pillow==7.*,>=7.0.0',
-        'pyres==1.*,>=1.5.0'
+        'pyres==1.*,>=1.5.0', 'sentry-sdk==0.*,>=0.14.2'
     ],
     extras_require={
         "dev": [
-            "black==19.*,>=19.10.0", "celery==4.*,>=4.4.1",
+            "black==19.*,>=19.10.0.b0", "celery==4.*,>=4.4.1",
             "flake8==3.*,>=3.7.9", "preggy==1.*,>=1.4.4", "pylint==2.*,>=2.4.4",
             "pytest==5.*,>=5.3.5", "pytest-asyncio==0.*,>=0.10.0",
             "pytest-cov==2.*,>=2.8.1", "pytest-tldr==0.*,>=0.2.1",
-            "pytest-xdist==1.*,>=1.31.0", "sentry-sdk==0.*,>=0.14.2"
+            "pytest-xdist==1.*,>=1.31.0"
         ]
     },
 )

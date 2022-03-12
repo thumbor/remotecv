@@ -36,7 +36,7 @@ setup(
         "remotecv.detectors.profile_detector": ["*.xml"]
     },
     install_requires=[
-        'opencv-python-headless==4.*,>=4.2.0', 'pillow==7.*,>=7.0.0',
+        'opencv-python-headless==4.*,>=4.2.0', 'pillow>=7,<10',
         'pyres==1.*,>=1.5.0', 'sentry-sdk==0.*,>=0.14.2'
     ],
     extras_require={

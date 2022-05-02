@@ -9,7 +9,7 @@ class UniqueQueue(ResQ):
         return value.replace(" ", "").replace("\n", "")
 
     def _create_unique_key(self, queue, key):
-        return "resque:unique:queue:%s:%s" % (queue, self._escape_for_key(str(key)))
+        return f"resque:unique:queue:{queue}%s:{self._escape_for_key(str(key))}%s"
 
     def add_unique_key(self, queue, key):
         unique_key = self._create_unique_key(queue, key)
@@ -56,7 +56,7 @@ class UniqueWorker(Worker):
         after_fork=None,
     ):
         self.after_fork_fn = after_fork
-        super(UniqueWorker, self).__init__(
+        super().__init__(
             queues, UniqueQueue(server=server), password, timeout
         )
 

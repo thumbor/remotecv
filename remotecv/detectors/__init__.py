@@ -27,7 +27,7 @@ class BaseDetector:
         image.save(img_buffer, self.__get_format(image))
         results = img_buffer.getvalue()
         img_buffer.close()
-        nparr = np.fromstring(results, np.uint8)
+        nparr = np.frombuffer(results, np.uint8)
         return cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)  # pylint: disable=no-member
 
     def detect(self, image):

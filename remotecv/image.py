@@ -3,7 +3,7 @@ from io import BytesIO
 from PIL import Image as PilImage
 
 PilImage.IGNORE_DECODING_ERRORS = True
-PilImage.MAXBLOCK = 2 ** 25
+PilImage.MAXBLOCK = 2**25
 
 
 class Image:

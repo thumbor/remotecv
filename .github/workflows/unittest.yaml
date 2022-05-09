@@ -1,0 +1,23 @@
+name: unittest
+on:
+  push:
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
+    name: Python ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install apt dependencies
+        run: sudo apt update && sudo apt install -y libjpeg-dev python3-opencv
+      - name: Install pip dependencies
+        run: make setup
+      - run: make unit

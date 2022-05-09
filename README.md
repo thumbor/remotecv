@@ -1,38 +1,57 @@
 [![Coverage
 Status](https://coveralls.io/repos/thumbor/remotecv/badge.svg?branch=master&service=github)](https://coveralls.io/github/thumbor/remotecv?branch=master)
 
-# Remotecv 
+# RemoteCV
 
-Remotecv is a queued mechanism to run OpenCV computations and store
+RemoteCV is a queued mechanism to run [OpenCV][opencv] computations and store
 them for later usage.
 
-Currently, [Thumbor](https://github.com/thumbor/thumbor/wiki) uses remotecv to
-outsource facial or feature detection, but nothing stops you from integrating
-it into your product.
+Currently, [Thumbor][thumbor] uses remotecv to outsource facial or feature
+detection, but nothing stops you from integrating it into your product.
 
-remotecv supports both [PyRes](https://github.com/binarydud/pyres) and
-[Celery](http://www.celeryproject.org/) for queueing back-end.
+RemoteCV supports both [PyRes][PyRes] and [Celery][Celery] for queueing
+back-end.
 
----
+## Install
 
-## install
+```sh
+pip install remotecv
+```
+
+## Run local
+
+Clone the repository:
+
+```sh
+git clone https://github.com/thumbor/remotecv.git
+```
+
+Create a virtualenv:
+
+```
+cd remotecv
+mkvirtualenv remotecv
+```
+
+Install dependencies:
 
 ```sh
 make setup
 ```
 
----
-
-## run local
+Run:
 
 ```sh
-make run-redis make run
+make run
 ```
 
----
-
-## tests
+## Tests
 
 ```sh
 make unit
 ```
+
+[thumbor]: https://github.com/thumbor/thumbor/wiki
+[PyRes]: https://github.com/binarydud/pyres
+[Celery]: https://www.celeryproject.org
+[opencv]: https://opencv.org/

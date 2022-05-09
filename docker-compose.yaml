@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  redis-test:
+    image: "redis:6.2-alpine"
+    ports:
+      - 6379:6379
+
+  redis-sentinel-test:
+    build:
+      context: ./tests/fixtures/redis-sentinel
+    ports:
+      - 6380:6380
+      - 6381:6381
+      - 6382:6382
+      - 6383:6383
+      - 26379:26379
+      - 26380:26380

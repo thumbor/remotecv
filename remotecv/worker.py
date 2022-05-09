@@ -12,11 +12,10 @@ import argparse
 import logging
 import sys
 from importlib import import_module
-
-from redis import Redis
+from threading import Thread
 
 from remotecv.error_handler import ErrorHandler
-from remotecv.utils import config
+from remotecv.utils import config, redis_client, SINGLE_NODE, SENTINEL
 
 
 def start_pyres_worker():
@@ -24,12 +23,7 @@ def start_pyres_worker():
         UniqueWorker,
     )
 
-    redis = Redis(
-        host=config.redis_host,
-        port=config.redis_port,
-        db=config.redis_database,
-        password=config.redis_password,
-    )
+    redis = redis_client()
 
     def after_fork(_):
         config.error_handler.install_handler()
@@ -74,6 +68,32 @@ def main(params=None):
     conn_group.add_argument("--port", default=6379, type=int, help="Redis port")
     conn_group.add_argument("--database", default=0, type=int, help="Redis database")
     conn_group.add_argument("--password", default=None, help="Redis password")
+    conn_group.add_argument(
+        "--redis-mode",
+        default=SINGLE_NODE,
+        choices=[SINGLE_NODE, SENTINEL],
+        help="Redis mode",
+    )
+    conn_group.add_argument(
+        "--sentinel-instances",
+        default="localhost:26376",
+        help="Redis Sentinel instances e.g. 'localhost:26376,localhost:26377'",
+    )
+    conn_group.add_argument(
+        "--sentinel-password", default=None, help="Redis Sentinel password"
+    )
+    conn_group.add_argument(
+        "--master-instance", default=None, help="Redis Sentinel master instance"
+    )
+    conn_group.add_argument(
+        "--master-password", default=None, help="Redis Sentinel master password"
+    )
+    conn_group.add_argument(
+        "--socket-timeout",
+        default=10.0,
+        type=float,
+        help="Redis Sentinel socket timeout",
+    )
 
     conn_group = parser.add_argument_group("Celery/SQS Connection Arguments")
     conn_group.add_argument("--region", default="us-east-1", help="AWS SQS Region")
@@ -119,6 +139,12 @@ def main(params=None):
     config.redis_port = arguments.port
     config.redis_database = arguments.database
     config.redis_password = arguments.password
+    config.redis_mode = arguments.redis_mode
+    config.redis_sentinel_instances = arguments.sentinel_instances
+    config.redis_sentinel_password = arguments.sentinel_password
+    config.redis_sentinel_socket_timeout = arguments.socket_timeout
+    config.redis_sentinel_master_instance = arguments.master_instance
+    config.redis_sentinel_master_password = arguments.master_password
 
     config.region = arguments.region
     config.key_id = arguments.key_id

@@ -1,7 +1,5 @@
-from redis import Redis
-
 from remotecv.result_store import BaseStore
-from remotecv.utils import logger
+from remotecv.utils import logger, redis_client
 
 
 class ResultStore(BaseStore):
@@ -13,12 +11,7 @@ class ResultStore(BaseStore):
         super().__init__(config)
 
         if not ResultStore.redis_instance:
-            ResultStore.redis_instance = Redis(
-                host=config.redis_host,
-                port=config.redis_port,
-                db=config.redis_database,
-                password=config.redis_password,
-            )
+            ResultStore.redis_instance = redis_client()
         self.storage = ResultStore.redis_instance
 
     def store(self, key, points):

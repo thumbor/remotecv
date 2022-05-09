@@ -8,7 +8,7 @@ class ResultStore(BaseStore):
     memcache_instance = None
 
     def __init__(self, config):
-        super(ResultStore, self).__init__(config)
+        super().__init__(config)
 
         # pylibmc must be imported
         import pylibmc  # pylint: disable=import-error,import-outside-toplevel
@@ -25,5 +25,5 @@ class ResultStore(BaseStore):
     def store(self, key, points):
         result = self.serialize(points)
         logger.debug("Points found: %s", result)
-        key = "thumbor-detector-%s" % key
+        key = f"thumbor-detector-{key}"
         self.storage.set(key, result, time=2 * self.WEEK)

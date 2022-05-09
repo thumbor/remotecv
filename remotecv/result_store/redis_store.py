@@ -10,7 +10,7 @@ class ResultStore(BaseStore):
     redis_instance = None
 
     def __init__(self, config):
-        super(ResultStore, self).__init__(config)
+        super().__init__(config)
 
         if not ResultStore.redis_instance:
             ResultStore.redis_instance = Redis(
@@ -24,7 +24,7 @@ class ResultStore(BaseStore):
     def store(self, key, points):
         result = self.serialize(points)
         logger.debug("Points found: %s", result)
-        redis_key = "thumbor-detector-%s" % key
+        redis_key = f"thumbor-detector-{key}"
         self.storage.setex(
             name=redis_key,
             value=result,

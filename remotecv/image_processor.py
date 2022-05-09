@@ -28,6 +28,6 @@ class ImageProcessor:
         for detector_key in detector.split("+"):
             try:
                 result = result + self.detectors[detector_key].detect(image)
-            except KeyError:
-                raise AttributeError("Detector unavailable")
+            except KeyError as key_error:
+                raise AttributeError("Detector unavailable") from key_error
         return result

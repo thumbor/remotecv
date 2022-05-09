@@ -1,21 +1,17 @@
-setup: update-setup
-	@poetry install
-
-update-setup:
-	@if [ "$(command -v dephell)" != "" ]; then echo 'Error: dephell is not installed. Installing...' && python3 -m pip install "dephell[full]"; fi
-	@dephell deps convert
+setup:
+	@pip install -Ue .[dev]
 
 run:
-	@poetry run remotecv
+	@remotecv
 
 unit:
-	@poetry run pytest -n `nproc` --cov=remotecv tests/
+	@pytest --cov=remotecv --cov-report term-missing --asyncio-mode=strict -r tests/
 
 flake:
-	@poetry run flake8 --config flake8
+	@flake8 --config flake8
 
 pylint:
-	@poetry run pylint remotecv tests
+	@pylint remotecv tests
 
 ci-test:
 	@if [ "$$LINT_TEST" ]; then $(MAKE) flake; else $(MAKE) unit; fi

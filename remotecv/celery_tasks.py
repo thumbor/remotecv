@@ -5,7 +5,7 @@ from remotecv.pyres_tasks import DetectTask
 
 class CeleryTasks:
     def __init__(self, key_id, key_secret, region, timeout=None, polling_interval=None):
-        self.celery = Celery(broker="sqs://%s:%s@" % (key_id, key_secret))
+        self.celery = Celery(broker=f"sqs://{key_id}:{key_secret}@")
 
         self.celery.conf.update(
             BROKER_TRANSPORT_OPTIONS={

@@ -20,4 +20,4 @@ jobs:
         run: sudo apt update && sudo apt install -y libjpeg-dev python3-opencv
       - name: Install pip dependencies
         run: make setup
-      - run: make unit
+      - run: make test

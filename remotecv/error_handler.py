@@ -1,7 +1,5 @@
-import pkgutil
 import sys
 
-import pkg_resources
 import sentry_sdk
 from sentry_sdk.integrations.logging import ignore_logger
 from sentry_sdk.utils import event_from_exception
@@ -26,21 +24,7 @@ class ErrorHandler:
         ignore_logger("tornado.access")
 
         sentry_sdk.init(**kwargs)
-        self.extra_data = {"modules": self.get_modules()}
         self.install_handler()
-
-    def get_modules(self):
-        resolved = {}
-        modules = [mod[1] for mod in tuple(pkgutil.iter_modules())]
-        for module in modules:
-            try:
-                res_mod = pkg_resources.get_distribution(module)
-                if res_mod is not None:
-                    resolved[module] = res_mod.version
-            except Exception:
-                pass
-
-        return resolved
 
     def install_handler(self):
         if not self.sentry_client:

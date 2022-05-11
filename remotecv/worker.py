@@ -11,11 +11,13 @@
 import argparse
 import logging
 import sys
+from http.server import HTTPServer
 from importlib import import_module
 from threading import Thread
 
 from remotecv.error_handler import ErrorHandler
 from remotecv.utils import config, redis_client, SINGLE_NODE, SENTINEL
+from remotecv.healthcheck import HealthCheckHandler
 
 
 def start_pyres_worker():
@@ -47,6 +49,18 @@ def start_celery_worker():
         config.polling_interval,
     )
     celery_tasks.run_commands(config.extra_args, log_level=config.log_level)
+
+
+def start_http_server():
+    def serve_forever(httpd):
+        with httpd:
+            httpd.serve_forever()
+
+    httpd = HTTPServer(("", config.server_port), HealthCheckHandler)
+
+    thread = Thread(target=serve_forever, args=(httpd,))
+    thread.setDaemon(True)
+    thread.start()
 
 
 def main(params=None):
@@ -104,6 +118,16 @@ def main(params=None):
     )
 
     other_group = parser.add_argument_group("Other arguments")
+    other_group.add_argument(
+        "--server-port", default=8080, type=int, help="Server http port"
+    )
+    other_group.add_argument(
+        "--with-healthcheck",
+        default=False,
+        type=bool,
+        action=argparse.BooleanOptionalAction,
+        help="Start an healthchecker http endpoint",
+    )
     other_group.add_argument("-l", "--level", default="debug", help="Logging level")
     other_group.add_argument(
         "-o", "--loader", default="remotecv.http_loader", help="Loader used"
@@ -152,6 +176,7 @@ def main(params=None):
     config.polling_interval = arguments.polling_interval
 
     config.timeout = arguments.timeout
+    config.server_port = arguments.server_port
     config.log_level = arguments.level.upper()
     config.loader = import_module(arguments.loader)
     config.store = import_module(arguments.store)
@@ -161,6 +186,9 @@ def main(params=None):
     config.extra_args = sys.argv[:1] + arguments.args
 
     config.error_handler = ErrorHandler(arguments.sentry_url)
+
+    if arguments.with_healthcheck:
+        start_http_server()
 
     if arguments.backend == "pyres":
         start_pyres_worker()

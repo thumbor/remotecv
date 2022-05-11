@@ -45,6 +45,20 @@ Run:
 make run
 ```
 
+After installing the project, you can execute
+
+```sh
+remotecv
+```
+
+If you want a healthcheck handler, you must pass an argument in remotecv
+execution. You can also specify the http server port, the default http server
+port is 8080.
+
+```sh
+remotecv --with-healthcheck --server-port=8888
+```
+
 ## Tests
 
 ```sh

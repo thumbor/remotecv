@@ -54,6 +54,7 @@ def __redis_sentinel_client():
         config.redis_sentinel_master_instance,
         socket_timeout=config.redis_sentinel_socket_timeout,
         password=config.redis_sentinel_master_password,
+        db=config.redis_sentinel_master_database,
     )
 
 

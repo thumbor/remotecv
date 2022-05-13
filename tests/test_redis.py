@@ -44,6 +44,7 @@ class RedisSentinelClientTestCase(TestCase):
         config.redis_sentinel_password = "superpassword"
         config.redis_sentinel_master_instance = "redismaster"
         config.redis_sentinel_master_password = None
+        config.redis_sentinel_master_database = 0
         config.redis_sentinel_socket_timeout = 10.0
 
         client = redis_client()
@@ -58,6 +59,7 @@ class RedisSentinelClientTestCase(TestCase):
         config.redis_sentinel_password = None
         config.redis_sentinel_master_instance = "redismaster"
         config.redis_sentinel_master_password = None
+        config.redis_sentinel_master_database = 0
         config.redis_sentinel_socket_timeout = 10.0
 
         client = redis_client()

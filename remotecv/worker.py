@@ -103,6 +103,12 @@ def main(params=None):
         "--master-password", default=None, help="Redis Sentinel master password"
     )
     conn_group.add_argument(
+        "--master-database",
+        default=0,
+        type=int,
+        help="Redis Sentinel master database",
+    )
+    conn_group.add_argument(
         "--socket-timeout",
         default=10.0,
         type=float,
@@ -169,6 +175,7 @@ def main(params=None):
     config.redis_sentinel_socket_timeout = arguments.socket_timeout
     config.redis_sentinel_master_instance = arguments.master_instance
     config.redis_sentinel_master_password = arguments.master_password
+    config.redis_sentinel_master_database = arguments.master_database
 
     config.region = arguments.region
     config.key_id = arguments.key_id

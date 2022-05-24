@@ -24,7 +24,7 @@ RUNTIME_REQUIREMENTS = [
 setup(
     long_description=readme,
     name="remotecv",
-    version="3.2.0",
+    version="3.2.1",
     description="remotecv is an OpenCV worker for facial and feature recognition",
     python_requires="==3.*,>=3.7.0",
     author="Bernardo Heynemann",

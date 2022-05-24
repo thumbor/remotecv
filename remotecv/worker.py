@@ -130,8 +130,7 @@ def main(params=None):
     other_group.add_argument(
         "--with-healthcheck",
         default=False,
-        type=bool,
-        action=argparse.BooleanOptionalAction,
+        action='store_true',
         help="Start an healthchecker http endpoint",
     )
     other_group.add_argument("-l", "--level", default="debug", help="Logging level")

@@ -1,0 +1,8 @@
+name: "thumbor-aws CodeQL config"
+
+paths:
+  - remotecv
+  - tests
+paths-ignore:
+  - .venv
+  - usr/lib

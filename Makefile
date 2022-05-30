@@ -16,7 +16,7 @@ unit:
 	@poetry run pytest --cov=remotecv --cov-report term-missing --asyncio-mode=strict -r tests/
 
 flake:
-	@poetry run flake8 --config flake8
+	@poetry run flake8 --config .flake8
 
 pylint:
 	@poetry run pylint remotecv tests

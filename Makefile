@@ -1,21 +1,25 @@
 REDIS_CONTAINER := redis-test redis-sentinel-test
 
 setup:
-	@pip install -Ue .[dev]
+	@poetry install
 
 run:
-	@remotecv
+	@poetry run remotecv
 
 test: run-redis unit stop-redis
 
+coverage:
+	@poetry run coverage report -m --fail-under=52
+	@poetry run coverage lcov
+
 unit:
-	@pytest --cov=remotecv --cov-report term-missing --asyncio-mode=strict -r tests/
+	@poetry run pytest --cov=remotecv --cov-report term-missing --asyncio-mode=strict -r tests/
 
 flake:
-	@flake8 --config flake8
+	@poetry run flake8 --config flake8
 
 pylint:
-	@pylint remotecv tests
+	@poetry run pylint remotecv tests
 
 ci-test:
 	@if [ "$$LINT_TEST" ]; then $(MAKE) flake; else $(MAKE) unit; fi

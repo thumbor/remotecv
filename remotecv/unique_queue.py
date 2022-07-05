@@ -9,11 +9,11 @@ class UniqueQueue(ResQ):
         return value.replace(" ", "").replace("\n", "")
 
     def _create_unique_key(self, queue, key):
-        return f"resque:unique:queue:{queue}%s:{self._escape_for_key(str(key))}%s"
+        return f"resque:unique:queue:{queue}:{self._escape_for_key(str(key))}"
 
     def add_unique_key(self, queue, key):
         unique_key = self._create_unique_key(queue, key)
-        if self.redis.get(unique_key) == "1":
+        if self.redis.get(unique_key) == b"1":
             # Do nothing as this message is already enqueued
             return False
 

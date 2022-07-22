@@ -228,6 +228,14 @@ def import_modules():
     help="Logging level",
 )
 @optgroup.option(
+    "-f",
+    "--format",
+    envvar="LOG_FORMAT",
+    show_envvar=True,
+    default="%(asctime)s %(name)s:%(levelname)s %(message)s",
+    help="Logging format",
+)
+@optgroup.option(
     "-o",
     "--loader",
     envvar="IMAGE_LOADER",
@@ -277,7 +285,7 @@ def import_modules():
 def main(**params):
     """Runs RemoteCV"""
 
-    logging.basicConfig(level=getattr(logging, params["level"].upper()))
+    logging.basicConfig(level=getattr(logging, params["level"].upper()), format=params["format"])
 
     config.backend = params["backend"]
     config.redis_host = params["host"]

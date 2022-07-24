@@ -12,7 +12,7 @@ unit:
 	@pytest --cov=remotecv --cov-report term-missing --asyncio-mode=strict -r tests/
 
 flake:
-	@flake8 --config flake8
+	@flake8 --config .flake8
 
 pylint:
 	@pylint remotecv tests

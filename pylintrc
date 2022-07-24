@@ -31,5 +31,6 @@ disable=
       C0103,
       E0110,
       R1732,
-      W1505
+      W1505,
+      protected-access
 

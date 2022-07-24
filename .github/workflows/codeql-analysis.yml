@@ -36,22 +36,8 @@ jobs:
         config-file: ./.github/codeql/codeql-config.yml
         setup-python-dependencies: false
 
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-    - name: Load cached venv
-      id: cached-poetry-dependencies
-      uses: actions/cache@v2
-      with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-    - name: Install dependencies
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install --no-interaction --no-root
     - name: Install remotecv
-      run: poetry install --no-interaction
+      run: make setup
 
     - name: Set CodeQL python
       run: echo "CODEQL_PYTHON=$(which python)" >> $GITHUB_ENV

@@ -11,6 +11,10 @@ test: run-redis unit stop-redis
 unit:
 	@pytest --cov=remotecv --cov-report term-missing --asyncio-mode=strict -r tests/
 
+coverage:
+	@coverage report -m --fail-under=52
+	@coverage lcov
+
 flake:
 	@flake8 --config .flake8
 

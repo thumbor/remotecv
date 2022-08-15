@@ -1,4 +1,4 @@
-name: "thumbor-aws CodeQL config"
+name: "remotecv CodeQL config"
 
 paths:
   - remotecv

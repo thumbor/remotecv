@@ -31,10 +31,6 @@ jobs:
         run: make run-redis
       - name: Run Unit Tests
         run: make unit
-        env:
-          # Only used for satisfying boto
-          AWS_ACCESS_KEY_ID: foobar
-          AWS_SECRET_ACCESS_KEY: foobar
       - name: Lint
         run: make flake pylint
       - name: Generate lcov

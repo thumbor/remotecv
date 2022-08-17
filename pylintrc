@@ -25,4 +25,12 @@ disable=
       broad-except,
       too-many-locals,
       too-many-public-methods,
-      fixme
+      fixme,
+      R0801,
+      R0915,
+      C0103,
+      E0110,
+      R1732,
+      W1505,
+      protected-access
+

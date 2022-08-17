@@ -1,0 +1,8 @@
+name: "remotecv CodeQL config"
+
+paths:
+  - remotecv
+  - tests
+paths-ignore:
+  - .venv
+  - usr/lib

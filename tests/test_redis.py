@@ -74,7 +74,7 @@ class RedisNoneClientTestCase(TestCase):
         config.redis_mode = None
 
         with self.assertRaises(AttributeError) as err:
-            client = redis_client()
+            redis_client()
 
         expect(str(err.exception)).to_equal(
             "redis-mode must be either single_node or sentinel"

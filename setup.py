@@ -4,14 +4,15 @@ readme = ""
 
 TESTS_REQUIREMENTS = [
     "celery==4.*,>=4.4.1",
-    "flake8==3.*,>=3.7.9",
-    "pylint==2.*,>=2.4.4",
+    "flake8==4.*,>=4.0.1",
+    "pylint==2.*,>=2.13.8",
     "black==22.*,>=22.1.0",
     "preggy==1.*,>=1.4.4",
     "pyssim==0.*,>=0.4",
     "pytest==7.*,>=7.0.0",
     "pytest-cov==3.*,>=3.0.0",
     "pytest-asyncio==0.*,>=0.18.0",
+    "coverage==6.*,>=6.3.2",
 ]
 
 RUNTIME_REQUIREMENTS = [

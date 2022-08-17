@@ -14,3 +14,6 @@ tests/visual_test/build
 build
 *.so
 .ropeproject/
+coverage.lcov
+.env/
+.venv/

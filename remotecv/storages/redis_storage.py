@@ -9,20 +9,21 @@
 # Copyright (c) 2011 globo.com thumbor@googlegroups.com
 
 
+from json import loads
+
 from aioredis import Redis
 from aioredis.sentinel import Sentinel
 from redis import RedisError
-from json import loads
-from remotecv.utils import logger
 
 
 SINGLE_NODE = "single_node"
 SENTINEL = "sentinel"
 
+
 class Storage:
     def __init__(self, context):
         self.context = context
-        self.redis_client = self.redis_client()
+        self.redis_client = self.get_redis_client()
 
     async def get_detector_data(self, path):
         data = await self.redis_client.get(f"thumbor-detector-{path}")
@@ -30,7 +31,7 @@ class Storage:
             return loads(data)
         return None
 
-    def redis_client(self):
+    def get_redis_client(self):
         redis_mode = str(self.context.config.REDIS_QUEUE_MODE).lower()
 
         if redis_mode == SINGLE_NODE:
@@ -51,6 +52,7 @@ class Storage:
         )
 
     def __redis_sentinel_client(self):
+
         instances_split = (
             self.context.config.REDIS_QUEUE_SENTINEL_INSTANCES.split(",")
         )
@@ -78,4 +80,3 @@ class Storage:
             password=self.context.config.REDIS_QUEUE_SENTINEL_MASTER_PASSWORD,
             db=self.context.config.REDIS_QUEUE_SENTINEL_MASTER_DB,
         )
-

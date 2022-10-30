@@ -9,7 +9,7 @@ run:
 test: run-redis unit stop-redis
 
 unit:
-	@pytest --cov=remotecv --cov-report term-missing --asyncio-mode=strict -r tests/
+	@pytest --cov=remotecv --cov-report term-missing --asyncio-mode=strict -s -r tests/
 
 coverage:
 	@coverage report -m --fail-under=52

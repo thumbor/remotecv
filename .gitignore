@@ -17,4 +17,3 @@ build
 coverage.lcov
 .env/
 .venv/
-.vscode/

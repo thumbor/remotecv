@@ -11,8 +11,8 @@
 
 from json import loads
 
-from aioredis import Redis
-from aioredis.sentinel import Sentinel
+from redis.asyncio import Redis
+from redis.asyncio.sentinel import Sentinel
 from redis import RedisError
 
 
@@ -57,7 +57,7 @@ class Storage:
             self.context.config.REDIS_QUEUE_SENTINEL_INSTANCES.split(",")
         )
         instances = [
-            tuple(instance.split(":")) for instance in instances_split
+            tuple(instance.split(":", 1)) for instance in instances_split
         ]
 
         if self.context.config.REDIS_QUEUE_SENTINEL_PASSWORD:

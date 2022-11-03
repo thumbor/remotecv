@@ -13,6 +13,7 @@ TESTS_REQUIREMENTS = [
     "pytest-cov==3.*,>=3.0.0",
     "pytest-asyncio==0.*,>=0.18.0",
     "coverage==6.*,>=6.3.2",
+    "thumbor==7.*",
 ]
 
 RUNTIME_REQUIREMENTS = [
@@ -20,6 +21,7 @@ RUNTIME_REQUIREMENTS = [
     "Pillow>=9.0.0",
     "pyres==1.*,>=1.5.0",
     "sentry-sdk==0.*,>=0.14.2",
+    "redis==4.*,>=4.2.0",
 ]
 
 setup(

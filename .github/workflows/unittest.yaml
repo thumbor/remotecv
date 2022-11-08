@@ -25,7 +25,7 @@ jobs:
       - name: APT Update
         run: sudo apt-get update -y
       - name: APT Install
-        run: sudo apt-get install -y libjpeg-dev python3-opencv
+        run: sudo apt-get install -y --no-install-recommends libjpeg-dev python3-opencv
       - name: Install remotecv
         run: make setup
       - run: docker-compose pull

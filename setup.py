@@ -50,7 +50,7 @@ setup(
             "Programming Language :: Python :: 3 :: Only",
             "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
             "Topic :: Multimedia :: Graphics :: Presentation",
-        ],
+    ],
     packages=[
         "remotecv",
         "remotecv.detectors",

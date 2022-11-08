@@ -26,8 +26,12 @@ jobs:
         run: sudo apt-get update -y
       - name: APT Install
         run: sudo apt-get install -y --no-install-recommends libjpeg-dev
+      - uses: actions/cache@v2
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.pythonLocation }}-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}
       - name: Install remotecv
-        run: make setup
+        run: pip install --upgrade --upgrade-strategy eager -e .[dev]
       - run: docker-compose pull
       - uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true

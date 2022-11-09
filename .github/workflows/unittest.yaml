@@ -10,23 +10,31 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - '3.7'
-          - '3.8'
-          - '3.9'
-          - '3.10'
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: APT Update
         run: sudo apt-get update -y
       - name: APT Install
-        run: sudo apt-get install -y libjpeg-dev python3-opencv
+        run: sudo apt-get install -y --no-install-recommends libjpeg-dev
+      - uses: actions/cache@v2
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.pythonLocation }}-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}
       - name: Install remotecv
-        run: make setup
+        run: pip install --upgrade --upgrade-strategy eager -e .[dev]
+      - run: docker-compose pull
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
       - name: Start Redis
         run: make run-redis
       - name: Run Unit Tests
@@ -46,8 +54,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Coveralls Finished
-      uses: coverallsapp/github-action@1.1.3
-      with:
-        github-token: ${{ secrets.github_token }}
-        parallel-finished: true
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@1.1.3
+        with:
+          github-token: ${{ secrets.github_token }}
+          parallel-finished: true

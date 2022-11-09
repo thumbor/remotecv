@@ -3,7 +3,7 @@ from setuptools import setup
 readme = ""
 
 TESTS_REQUIREMENTS = [
-    "celery==4.*,>=4.4.1",
+    "celery==5.*,>=5.2.7",
     "flake8==4.*,>=4.0.1",
     "pylint==2.*,>=2.13.8",
     "black==22.*,>=22.1.0",
@@ -34,6 +34,23 @@ setup(
     author_email="heynemann@gmail.com",
     license="MIT",
     entry_points={"console_scripts": ["remotecv = remotecv.worker:main"]},
+    classifiers=[
+            "Development Status :: 4 - Beta",
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: MIT License",
+            "Natural Language :: English",
+            "Operating System :: MacOS",
+            "Operating System :: POSIX :: Linux",
+            "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
+            "Programming Language :: Python :: 3 :: Only",
+            "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+            "Topic :: Multimedia :: Graphics :: Presentation",
+    ],
     packages=[
         "remotecv",
         "remotecv.detectors",

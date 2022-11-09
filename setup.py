@@ -36,6 +36,7 @@ RUNTIME_REQUIREMENTS = [
 
 setup(
     long_description=long_description,
+    long_description_content_type="text/markdown",
     name="remotecv",
     version=version,
     description="remotecv is an OpenCV worker for facial and feature recognition",

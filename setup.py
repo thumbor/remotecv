@@ -1,6 +1,16 @@
+from pathlib import Path
+
 from setuptools import setup
 
-readme = ""
+
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text(encoding="utf-8")
+
+with open("remotecv/__init__.py") as f:
+    ns = {}
+    exec(f.read(), ns)
+    version = ns["__version__"]
+
 
 TESTS_REQUIREMENTS = [
     "celery==5.*,>=5.2.7",
@@ -25,9 +35,9 @@ RUNTIME_REQUIREMENTS = [
 ]
 
 setup(
-    long_description=readme,
+    long_description=long_description,
     name="remotecv",
-    version="3.2.2",
+    version=version,
     description="remotecv is an OpenCV worker for facial and feature recognition",
     python_requires="==3.*,>=3.7.0",
     author="Bernardo Heynemann",

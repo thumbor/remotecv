@@ -1,6 +1,8 @@
 from celery import Celery
 
 from remotecv.pyres_tasks import DetectTask
+from remotecv.timing import get_time, get_interval
+from remotecv.utils import context
 
 
 class CeleryTasks:
@@ -19,7 +21,14 @@ class CeleryTasks:
     def get_detect_task(self):
         @self.celery.task(ignore_result=True, acks_late=True)
         def detect_task(detection_type, image_path, key):
+            start_time = get_time()
             DetectTask.perform(detection_type, image_path, key)
+
+            context.metrics.timing(
+                "worker.celery_task.time",
+                get_interval(start_time, get_time()),
+            )
+            context.metrics.incr("worker.celery_task.total")
 
         return detect_task
 

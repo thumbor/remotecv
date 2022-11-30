@@ -17,8 +17,13 @@ class Config:
     pass
 
 
+class Context:
+    pass
+
+
 logger = logging.getLogger("remotecv")  # pylint: disable=invalid-name
 config = Config()  # pylint: disable=invalid-name
+context = Context()
 
 SINGLE_NODE = "single_node"
 SENTINEL = "sentinel"

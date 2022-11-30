@@ -6,7 +6,7 @@ from unittest import TestCase, mock
 from preggy import expect
 
 from remotecv.pyres_tasks import DetectTask
-from remotecv.utils import config
+from remotecv.utils import config, context
 from tests import read_fixture
 
 
@@ -16,6 +16,7 @@ class DetectTaskTestCase(TestCase):
         config.loader = mock.Mock(load_sync=read_fixture)
         config.store = store_mock
         config.store.ResultStore = mock.Mock(return_value=store_mock)
+        context.metrics = mock.Mock()
         DetectTask.perform("all", "group-smile-bw.jpg", "test-key")
         call = store_mock.store.call_args[0]
 

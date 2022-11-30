@@ -70,6 +70,7 @@ setup(
         "remotecv.detectors.feature_detector",
         "remotecv.detectors.glasses_detector",
         "remotecv.detectors.profile_detector",
+        "remotecv.metrics",
         "remotecv.result_store",
     ],
     package_dir={"": "."},

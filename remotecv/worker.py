@@ -16,8 +16,9 @@ from importlib import import_module
 from threading import Thread
 
 from remotecv.error_handler import ErrorHandler
-from remotecv.utils import config, redis_client, SINGLE_NODE, SENTINEL
 from remotecv.healthcheck import HealthCheckHandler
+from remotecv.importer import Importer
+from remotecv.utils import config, redis_client, SINGLE_NODE, SENTINEL, context
 
 
 def start_pyres_worker():
@@ -61,6 +62,12 @@ def start_http_server():
     thread = Thread(target=serve_forever, args=(httpd,))
     thread.setDaemon(True)
     thread.start()
+
+
+def import_modules():
+    Metrics = Importer.import_class("Metrics", config.metrics)
+    context.metrics = Metrics(config)
+    context.metrics.initialize()
 
 
 def main(params=None):
@@ -150,6 +157,11 @@ def main(params=None):
     other_group.add_argument(
         "--sentry_url", default=None, help="URL used to send errors to sentry"
     )
+    other_group.add_argument(
+        "--metrics",
+        default="remotecv.metrics.logger_metrics",
+        help="Metrics client, should be the full name of a python module",
+    )
 
     memcache_store_group = parser.add_argument_group("Memcache store arguments")
     memcache_store_group.add_argument(
@@ -186,12 +198,15 @@ def main(params=None):
     config.log_level = arguments.level.upper()
     config.loader = import_module(arguments.loader)
     config.store = import_module(arguments.store)
+    config.metrics = arguments.metrics
 
     config.memcache_hosts = arguments.memcache_hosts
 
     config.extra_args = sys.argv[:1] + arguments.args
 
     config.error_handler = ErrorHandler(arguments.sentry_url)
+
+    import_modules()
 
     if arguments.with_healthcheck:
         start_http_server()

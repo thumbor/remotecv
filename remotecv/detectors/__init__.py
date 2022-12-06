@@ -49,8 +49,17 @@ class CascadeLoaderDetector(BaseDetector):
     def get_features(self, image):
         img = self.get_np_img(image)
 
+        return self.get_faces(img, image.size)
+
+    def get_grayscale_equalized_features(self, image):
+        img = self.get_np_img(image)
+        img_equalized = cv2.equalizeHist(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))
+
+        return self.get_faces(img_equalized, image.size)
+
+    def get_faces(self, image, image_size):
         faces = self.__class__.cascade.detectMultiScale(
-            img, 1.2, 4, minSize=self.get_min_size_for(image.size)
+            image, 1.2, 4, minSize=self.get_min_size_for(image_size)
         )
         faces_scaled = []
 

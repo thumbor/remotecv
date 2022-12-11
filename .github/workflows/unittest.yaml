@@ -26,7 +26,7 @@ jobs:
         run: sudo apt-get update -y
       - name: APT Install
         run: sudo apt-get install -y --no-install-recommends libjpeg-dev
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ${{ env.pythonLocation }}
           key: ubuntu-22.04-${{ env.pythonLocation }}-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}

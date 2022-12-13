@@ -33,6 +33,8 @@ RUNTIME_REQUIREMENTS = [
     "pyres==1.*,>=1.5.0",
     "redis==4.*,>=4.2.0",
     "sentry-sdk==0.*,>=0.14.2",
+    "click==8.*",
+    "click-option-group==0.5.*",
 ]
 
 setup(

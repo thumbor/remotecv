@@ -17,6 +17,7 @@ TESTS_REQUIREMENTS = [
     "celery==5.*,>=5.2.7",
     "coverage==6.*,>=6.3.2",
     "flake8==4.*,>=4.0.1",
+    "pre-commit==2.*,>=2.20.0",
     "preggy==1.*,>=1.4.4",
     "pylint==2.*,>=2.13.8",
     "pyssim==0.*,>=0.4",

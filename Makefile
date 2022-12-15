@@ -2,6 +2,7 @@ REDIS_CONTAINER := redis-test redis-sentinel-test
 
 setup:
 	@pip install -Ue .[dev]
+	@echo  "\n\nYou are strongly recommended to run 'pre-commit install'\n"
 
 run:
 	@remotecv

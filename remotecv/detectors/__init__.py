@@ -28,7 +28,9 @@ class BaseDetector:
         results = img_buffer.getvalue()
         img_buffer.close()
         nparr = np.frombuffer(results, np.uint8)
-        return cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)  # pylint: disable=no-member
+        return cv2.imdecode(
+            nparr, cv2.IMREAD_UNCHANGED
+        )  # pylint: disable=no-member
 
     def detect(self, image):
         raise NotImplementedError()
@@ -37,9 +39,9 @@ class BaseDetector:
 class CascadeLoaderDetector(BaseDetector):
     def load_cascade_file(self, module_path, cascade_file_path):
         cascade_file = join(abspath(dirname(module_path)), cascade_file_path)
-        self.__class__.cascade = cv2.CascadeClassifier(  # pylint: disable=no-member
+        self.__class__.cascade = cv2.CascadeClassifier(
             cascade_file
-        )
+        )  # pylint: disable=no-member
 
     def get_min_size_for(self, size):
         ratio = int(min(size[0], size[1]) / 15)

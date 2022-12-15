@@ -36,7 +36,9 @@ def redis_client():
     if config.redis_mode == SENTINEL:
         return __redis_sentinel_client()
 
-    raise AttributeError(f"redis-mode must be either {SINGLE_NODE} or {SENTINEL}")
+    raise AttributeError(
+        f"redis-mode must be either {SINGLE_NODE} or {SENTINEL}"
+    )
 
 
 def __redis_sentinel_client():

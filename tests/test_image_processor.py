@@ -40,7 +40,9 @@ class ImageProcessorTest(TestCase):
 
     def test_feature_detection(self):
         image_processor = ImageProcessor()
-        detect = image_processor.detect("feature", read_fixture("one_face.jpg"))
+        detect = image_processor.detect(
+            "feature", read_fixture("one_face.jpg")
+        )
         expect(detect).Not.to_be_empty()
 
     def test_should_be_empty_when_invalid_image(self):

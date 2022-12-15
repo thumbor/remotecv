@@ -6,7 +6,9 @@ from remotecv.utils import context
 
 
 class CeleryTasks:
-    def __init__(self, key_id, key_secret, region, timeout=None, polling_interval=None):
+    def __init__(
+        self, key_id, key_secret, region, timeout=None, polling_interval=None
+    ):
         self.celery = Celery(broker=f"sqs://{key_id}:{key_secret}@")
 
         self.celery.conf.update(

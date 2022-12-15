@@ -6,7 +6,7 @@ from unittest import TestCase, mock
 from preggy import expect
 from click.testing import CliRunner
 
-import remotecv.worker as worker
+from remotecv import worker
 
 
 @mock.patch("remotecv.worker.start_pyres_worker")

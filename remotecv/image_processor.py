@@ -7,6 +7,8 @@ from remotecv.detectors.feature_detector import FeatureDetector
 from remotecv.detectors.glasses_detector import GlassesDetector
 from remotecv.detectors.profile_detector import ProfileDetector
 from remotecv.image import Image
+from remotecv.timing import get_time, get_interval
+from remotecv.utils import context
 
 
 class ImageProcessor:
@@ -20,14 +22,27 @@ class ImageProcessor:
         }
 
     def detect(self, detector, image_data):
-        result = []
         image = Image.create_from_buffer(image_data)
         if image is None:
             return []
 
-        for detector_key in detector.split("+"):
+        return self.run_detections(image, detector.split("+"))
+
+    def run_detections(self, image, detectors):
+        result = []
+        for detector in detectors:
             try:
-                result = result + self.detectors[detector_key].detect(image)
+                start_time = get_time()
+                points = self.detectors[detector].detect(image)
+                context.metrics.timing(
+                    f"worker.{detector}.time",
+                    get_interval(start_time, get_time()),
+                )
+                if points:
+                    context.metrics.incr(f"worker.{detector}.detected")
+
+                result = result + points
             except KeyError as key_error:
                 raise AttributeError("Detector unavailable") from key_error
+
         return result

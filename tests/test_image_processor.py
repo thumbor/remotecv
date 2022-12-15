@@ -1,12 +1,16 @@
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from preggy import expect
 
 from remotecv.image_processor import ImageProcessor
+from remotecv.utils import context
 from tests import read_fixture
 
 
 class ImageProcessorTest(TestCase):
+    def setUp(self):
+        context.metrics = mock.Mock()
+
     def test_when_detector_unavailable(self):
         image_processor = ImageProcessor()
         with expect.error_to_happen(AttributeError):

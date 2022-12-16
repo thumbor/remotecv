@@ -32,7 +32,10 @@ def start_pyres_worker():
         config.error_handler.install_handler()
 
     worker = UniqueWorker(
-        queues=["Detect"], server=redis, timeout=config.timeout, after_fork=after_fork
+        queues=["Detect"],
+        server=redis,
+        timeout=config.timeout,
+        after_fork=after_fork,
     )
     worker.work()
 
@@ -86,8 +89,12 @@ def main(params=None):
 
     conn_group = parser.add_argument_group("Pyres Connection Arguments")
     conn_group.add_argument("--host", default="localhost", help="Redis host")
-    conn_group.add_argument("--port", default=6379, type=int, help="Redis port")
-    conn_group.add_argument("--database", default=0, type=int, help="Redis database")
+    conn_group.add_argument(
+        "--port", default=6379, type=int, help="Redis port"
+    )
+    conn_group.add_argument(
+        "--database", default=0, type=int, help="Redis database"
+    )
     conn_group.add_argument("--password", default=None, help="Redis password")
     conn_group.add_argument(
         "--redis-mode",
@@ -104,10 +111,14 @@ def main(params=None):
         "--sentinel-password", default=None, help="Redis Sentinel password"
     )
     conn_group.add_argument(
-        "--master-instance", default=None, help="Redis Sentinel master instance"
+        "--master-instance",
+        default=None,
+        help="Redis Sentinel master instance",
     )
     conn_group.add_argument(
-        "--master-password", default=None, help="Redis Sentinel master password"
+        "--master-password",
+        default=None,
+        help="Redis Sentinel master password",
     )
     conn_group.add_argument(
         "--master-database",
@@ -123,9 +134,13 @@ def main(params=None):
     )
 
     conn_group = parser.add_argument_group("Celery/SQS Connection Arguments")
-    conn_group.add_argument("--region", default="us-east-1", help="AWS SQS Region")
+    conn_group.add_argument(
+        "--region", default="us-east-1", help="AWS SQS Region"
+    )
     conn_group.add_argument("--key_id", default="", help="AWS access key id")
-    conn_group.add_argument("--key_secret", default="", help="AWS access key secret")
+    conn_group.add_argument(
+        "--key_secret", default="", help="AWS access key secret"
+    )
     conn_group.add_argument(
         "--polling_interval", default=20, help="AWS polling interval"
     )
@@ -137,15 +152,20 @@ def main(params=None):
     other_group.add_argument(
         "--with-healthcheck",
         default=False,
-        action='store_true',
+        action="store_true",
         help="Start an healthchecker http endpoint",
     )
-    other_group.add_argument("-l", "--level", default="debug", help="Logging level")
+    other_group.add_argument(
+        "-l", "--level", default="debug", help="Logging level"
+    )
     other_group.add_argument(
         "-o", "--loader", default="remotecv.http_loader", help="Loader used"
     )
     other_group.add_argument(
-        "-s", "--store", default="remotecv.result_store.redis_store", help="Loader used"
+        "-s",
+        "--store",
+        default="remotecv.result_store.redis_store",
+        help="Loader used",
     )
     other_group.add_argument(
         "-t",
@@ -163,7 +183,9 @@ def main(params=None):
         help="Metrics client, should be the full name of a python module",
     )
 
-    memcache_store_group = parser.add_argument_group("Memcache store arguments")
+    memcache_store_group = parser.add_argument_group(
+        "Memcache store arguments"
+    )
     memcache_store_group.add_argument(
         "--memcache_hosts",
         default="localhost:11211",

@@ -15,7 +15,9 @@ class GlassesDetectorTestCase(TestCase):
         context.metrics = mock.Mock()
 
     def test_should_detect_glasses(self):
-        detection_result = GlassesDetector().detect(create_image("glasses.jpg"))
+        detection_result = GlassesDetector().detect(
+            create_image("glasses.jpg")
+        )
         expect(detection_result).to_length(2)
         expect(detection_result[0][0]).to_be_numeric()
         expect(detection_result[0][1]).to_be_numeric()

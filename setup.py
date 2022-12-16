@@ -6,23 +6,24 @@ from setuptools import setup
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text(encoding="utf-8")
 
-with open("remotecv/__init__.py") as f:
+with open("remotecv/__init__.py", encoding="utf-8") as f:
     ns = {}
-    exec(f.read(), ns)
+    exec(f.read(), ns)  # pylint: disable=exec-used
     version = ns["__version__"]
 
 
 TESTS_REQUIREMENTS = [
-    "celery==5.*,>=5.2.7",
-    "flake8==4.*,>=4.0.1",
-    "pylint==2.*,>=2.13.8",
     "black==22.*,>=22.1.0",
-    "preggy==1.*,>=1.4.4",
-    "pyssim==0.*,>=0.4",
-    "pytest==7.*,>=7.0.0",
-    "pytest-cov==3.*,>=3.0.0",
-    "pytest-asyncio==0.*,>=0.18.0",
+    "celery==5.*,>=5.2.7",
     "coverage==6.*,>=6.3.2",
+    "flake8==4.*,>=4.0.1",
+    "pre-commit==2.*,>=2.20.0",
+    "preggy==1.*,>=1.4.4",
+    "pylint==2.*,>=2.13.8",
+    "pyssim==0.*,>=0.4",
+    "pytest-asyncio==0.*,>=0.18.0",
+    "pytest-cov==3.*,>=3.0.0",
+    "pytest==7.*,>=7.0.0",
     "thumbor==7.*",
 ]
 
@@ -30,8 +31,8 @@ RUNTIME_REQUIREMENTS = [
     "opencv-python-headless==4.*,>=4.2.0",
     "Pillow>=9.0.0",
     "pyres==1.*,>=1.5.0",
-    "sentry-sdk==0.*,>=0.14.2",
     "redis==4.*,>=4.2.0",
+    "sentry-sdk==0.*,>=0.14.2",
 ]
 
 setup(
@@ -46,21 +47,21 @@ setup(
     license="MIT",
     entry_points={"console_scripts": ["remotecv = remotecv.worker:main"]},
     classifiers=[
-            "Development Status :: 4 - Beta",
-            "Intended Audience :: Developers",
-            "License :: OSI Approved :: MIT License",
-            "Natural Language :: English",
-            "Operating System :: MacOS",
-            "Operating System :: POSIX :: Linux",
-            "Programming Language :: Python :: 3",
-            "Programming Language :: Python :: 3.7",
-            "Programming Language :: Python :: 3.8",
-            "Programming Language :: Python :: 3.9",
-            "Programming Language :: Python :: 3.10",
-            "Programming Language :: Python :: 3.11",
-            "Programming Language :: Python :: 3 :: Only",
-            "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-            "Topic :: Multimedia :: Graphics :: Presentation",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Operating System :: MacOS",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3 :: Only",
+        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+        "Topic :: Multimedia :: Graphics :: Presentation",
     ],
     packages=[
         "remotecv",

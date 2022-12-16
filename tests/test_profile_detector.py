@@ -15,7 +15,9 @@ class ProfileDetectorTestCase(TestCase):
         context.metrics = mock.Mock()
 
     def test_should_detect_one_face(self):
-        detection_result = ProfileDetector().detect(create_image("profile_face.jpg"))
+        detection_result = ProfileDetector().detect(
+            create_image("profile_face.jpg")
+        )
         expect(detection_result).to_length(1)
         expect(detection_result[0][0]).to_be_numeric()
         expect(detection_result[0][1]).to_be_numeric()
@@ -23,5 +25,7 @@ class ProfileDetectorTestCase(TestCase):
         expect(detection_result[0][3]).to_be_numeric()
 
     def test_should_not_detect(self):
-        detection_result = ProfileDetector().detect(create_image("no_face.jpg"))
+        detection_result = ProfileDetector().detect(
+            create_image("no_face.jpg")
+        )
         expect(detection_result).to_length(0)

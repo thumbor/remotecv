@@ -18,7 +18,11 @@ class ResultStore(BaseStore):
             ResultStore.memcache_instance = pylibmc.Client(
                 host_strings,
                 binary=True,
-                behaviors={"tcp_nodelay": True, "no_block": True, "ketama": True},
+                behaviors={
+                    "tcp_nodelay": True,
+                    "no_block": True,
+                    "ketama": True,
+                },
             )
         self.storage = ResultStore.memcache_instance
 

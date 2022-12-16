@@ -32,4 +32,3 @@ disable=
       W1505,
       protected-access,
       no-member
-

@@ -24,7 +24,9 @@ class UniqueQueue(ResQ):
         unique_key = self._create_unique_key(queue, key)
         self.redis.delete(unique_key)
 
-    def enqueue_unique_from_string(self, klass_as_string, queue, args=None, key=None):
+    def enqueue_unique_from_string(
+        self, klass_as_string, queue, args=None, key=None
+    ):
         if not self.add_unique_key(queue, key):
             logger.debug("key %s already enqueued", key)
             return
@@ -56,9 +58,7 @@ class UniqueWorker(Worker):
         after_fork=None,
     ):
         self.after_fork_fn = after_fork
-        super().__init__(
-            queues, UniqueQueue(server=server), password, timeout
-        )
+        super().__init__(queues, UniqueQueue(server=server), password, timeout)
 
     def after_fork(self, job):
         if self.after_fork_fn and callable(self.after_fork_fn):

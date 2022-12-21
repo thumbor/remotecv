@@ -14,7 +14,7 @@ HAIR_OFFSET = 0.12
 
 class FaceDetector(CascadeLoaderDetector):
     def __init__(self):
-        self.load_cascade_file(__file__, "haarcascade_frontalface_alt.xml")
+        self.load_cascade_file(__file__, "haarcascade_frontalface_default.xml")
 
     def __add_hair_offset(self, top, height):
         top = max(0, top - height * HAIR_OFFSET)

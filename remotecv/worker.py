@@ -81,26 +81,44 @@ def import_modules():
     "-b",
     "--backend",
     envvar="BACKEND",
+    show_envvar=True,
     default="pyres",
     type=click.Choice(["pyres", "celery"]),
     help="Worker backend",
 )
 @optgroup.group("Pyres Connection Arguments")
 @optgroup.option(
-    "--host", envvar="REDIS_HOST", default="localhost", help="Redis host"
+    "--host",
+    envvar="REDIS_HOST",
+    show_envvar=True,
+    default="localhost",
+    help="Redis host",
 )
 @optgroup.option(
-    "--port", envvar="REDIS_PORT", default=6379, help="Redis port"
+    "--port",
+    envvar="REDIS_PORT",
+    show_envvar=True,
+    default=6379,
+    help="Redis port",
 )
 @optgroup.option(
-    "--database", envvar="REDIS_DATABASE", default=0, help="Redis database"
+    "--database",
+    envvar="REDIS_DATABASE",
+    show_envvar=True,
+    default=0,
+    help="Redis database",
 )
 @optgroup.option(
-    "--password", envvar="REDIS_PASSWORD", default=None, help="Redis password"
+    "--password",
+    envvar="REDIS_PASSWORD",
+    show_envvar=True,
+    default=None,
+    help="Redis password",
 )
 @optgroup.option(
     "--redis-mode",
     envvar="REDIS_MODE",
+    show_envvar=True,
     default=SINGLE_NODE,
     type=click.Choice([SINGLE_NODE, SENTINEL]),
     help="Redis mode",
@@ -108,36 +126,42 @@ def import_modules():
 @optgroup.option(
     "--sentinel-instances",
     envvar="REDIS_SENTINEL_INSTANCES",
+    show_envvar=True,
     default="localhost:26376",
     help="Redis Sentinel instances e.g. 'localhost:26376,localhost:26377'",
 )
 @optgroup.option(
     "--sentinel-password",
     envvar="REDIS_SENTINEL_PASSWORD",
+    show_envvar=True,
     default=None,
     help="Redis Sentinel password",
 )
 @optgroup.option(
     "--master-instance",
     envvar="REDIS_MASTER_INSTANCE",
+    show_envvar=True,
     default=None,
     help="Redis Sentinel master instance",
 )
 @optgroup.option(
     "--master-password",
     envvar="REDIS_MASTER_PASSWORD",
+    show_envvar=True,
     default=None,
     help="Redis Sentinel master password",
 )
 @optgroup.option(
     "--master-database",
     envvar="REDIS_MASTER_DATABASE",
+    show_envvar=True,
     default=0,
     help="Redis Sentinel master database",
 )
 @optgroup.option(
     "--socket-timeout",
     envvar="REDIS_SENTINEL_SOCKET_TIMEOUT",
+    show_envvar=True,
     default=10.0,
     help="Redis Sentinel socket timeout",
 )
@@ -145,30 +169,35 @@ def import_modules():
 @optgroup.option(
     "--region",
     envvar="AWS_REGION",
+    show_envvar=True,
     default="us-east-1",
     help="AWS SQS Region",
 )
 @optgroup.option(
     "--key-id",
     envvar="AWS_ACCESS_KEY_ID",
+    show_envvar=True,
     default=None,
     help="AWS access key id",
 )
 @optgroup.option(
     "--key-secret",
     envvar="AWS_SECRET_ACCESS_KEY",
+    show_envvar=True,
     default=None,
     help="AWS access key secret",
 )
 @optgroup.option(
     "--polling-interval",
     envvar="SQS_POLLING_INTERVAL",
+    show_envvar=True,
     default=20,
     help="AWS polling interval",
 )
 @optgroup.option(
     "--celery-commands",
     envvar="CELERY_COMMANDS",
+    show_envvar=True,
     default=[],
     multiple=True,
     help="SQS command",
@@ -177,12 +206,14 @@ def import_modules():
 @optgroup.option(
     "--server-port",
     envvar="HTTP_SERVER_PORT",
+    show_envvar=True,
     default=8080,
     help="HTTP server port",
 )
 @optgroup.option(
     "--with-healthcheck",
     envvar="WITH_HEALTHCHECK",
+    show_envvar=True,
     is_flag=True,
     default=False,
     help="Start a healthcheck http endpoint",
@@ -191,6 +222,7 @@ def import_modules():
     "-l",
     "--level",
     envvar="LOG_LEVEL",
+    show_envvar=True,
     type=click.Choice(["debug", "info", "warning", "error", "critical"]),
     default="debug",
     help="Logging level",
@@ -199,6 +231,7 @@ def import_modules():
     "-o",
     "--loader",
     envvar="IMAGE_LOADER",
+    show_envvar=True,
     default="remotecv.http_loader",
     help="Image loader",
 )
@@ -206,6 +239,7 @@ def import_modules():
     "-s",
     "--store",
     envvar="DETECTOR_STORAGE",
+    show_envvar=True,
     default="remotecv.result_store.redis_store",
     help="Detector result store",
 )
@@ -213,6 +247,7 @@ def import_modules():
     "-t",
     "--timeout",
     envvar="DETECTOR_TIMEOUT",
+    show_envvar=True,
     default=None,
     type=click.INT,
     help="Timeout in seconds for image detection",
@@ -220,12 +255,14 @@ def import_modules():
 @optgroup.option(
     "--sentry-url",
     envvar="SENTRY_URL",
+    show_envvar=True,
     default=None,
     help="Sentry URL",
 )
 @optgroup.option(
     "--metrics",
     envvar="METRICS_CLIENT",
+    show_envvar=True,
     default="remotecv.metrics.logger_metrics",
     help="Metrics client, should be the full name of a python module",
 )
@@ -233,6 +270,7 @@ def import_modules():
 @optgroup.option(
     "--memcached-hosts",
     envvar="MEMCACHED_HOSTS",
+    show_envvar=True,
     default="localhost:11211",
     help="Comma separated list of memcached hosts",
 )

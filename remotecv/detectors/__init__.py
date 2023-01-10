@@ -55,7 +55,11 @@ class CascadeLoaderDetector(BaseDetector):
 
     def get_grayscale_equalized_features(self, image):
         img = self.get_np_img(image)
-        img_equalized = cv2.equalizeHist(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))
+
+        if image.mode.upper() not in ["L", "1"]:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        img_equalized = cv2.equalizeHist(img)
 
         return self.get_faces(img_equalized, image.size)
 

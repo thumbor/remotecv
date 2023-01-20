@@ -3,6 +3,7 @@
 
 from remotecv.detectors.complete_detector import CompleteDetector
 from remotecv.detectors.face_detector import FaceDetector
+from remotecv.detectors.yunet_face_detector import YuNetFaceDetector
 from remotecv.detectors.feature_detector import FeatureDetector
 from remotecv.detectors.glasses_detector import GlassesDetector
 from remotecv.detectors.profile_detector import ProfileDetector
@@ -16,6 +17,7 @@ class ImageProcessor:
         self.detectors = {
             "all": CompleteDetector(),
             "face": FaceDetector(),
+            "yunet_face": YuNetFaceDetector(),
             "feature": FeatureDetector(),
             "glass": GlassesDetector(),
             "profile": ProfileDetector(),

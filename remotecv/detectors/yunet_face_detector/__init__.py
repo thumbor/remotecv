@@ -30,16 +30,25 @@ class YuNetFaceDetector(BaseDetector):
             ),
             config="",
             input_size=image_size,
-            score_threshold=0.6,
+            score_threshold=0.9,
             nms_threshold=0.3,
             top_k=5000,
             backend_id=cv2.dnn.DNN_BACKEND_OPENCV,
             target_id=cv2.dnn.DNN_TARGET_CPU,
         )
-        return model.detect(image)[1]
+        detected_faces = model.detect(image)
+        return detected_faces[1]
 
     def detect(self, image):
-        features = self.get_faces(self.get_np_img(image), image.size)
+        img = self.get_np_img(image)
+        
+        channels = 1 if len(img.shape) == 2 else img.shape[2]
+        if channels == 1:
+            img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+        if channels == 4:
+            img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+
+        features = self.get_faces(img, image.size)
         points = []
         if features.any():
             for face in features.astype(numpy.int32):

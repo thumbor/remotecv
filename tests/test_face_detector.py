@@ -22,8 +22,20 @@ class FaceDetectorTestCase(TestCase):
         expect(detection_result[0][2]).to_be_numeric()
         expect(detection_result[0][3]).to_be_numeric()
 
+    def test_should_detect_one_face_on_ico(self):
+        detection_result = FaceDetector().detect(create_image("one_face.ico"))
+        expect(detection_result).to_length(1)
+        expect(detection_result[0][0]).to_be_numeric()
+        expect(detection_result[0][1]).to_be_numeric()
+        expect(detection_result[0][2]).to_be_numeric()
+        expect(detection_result[0][3]).to_be_numeric()
+
     def test_should_not_detect(self):
         detection_result = FaceDetector().detect(create_image("no_face.jpg"))
+        expect(detection_result).to_be_empty()
+
+    def test_should_not_detect_on_ico(self):
+        detection_result = FaceDetector().detect(create_image("no_face.ico"))
         expect(detection_result).to_be_empty()
 
     def test_should_run_on_multiple_faces(self):

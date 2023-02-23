@@ -18,7 +18,7 @@ import numpy as np
 class BaseDetector:
     def __get_format(self, image):
         fmt = image.format
-        if fmt == "GIF":
+        if fmt in ["GIF", "ICO"]:
             return "PNG"
         return fmt
 

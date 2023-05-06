@@ -41,6 +41,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     name="remotecv",
+    url="https://github.com/thumbor/remotecv",
     version=version,
     description="remotecv is an OpenCV worker for facial and feature recognition",
     python_requires="==3.*,>=3.7.0",

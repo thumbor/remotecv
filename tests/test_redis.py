@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from preggy import expect
 
-from remotecv.utils import config, redis_client
+from remotecv.utils import context, config, redis_client
 
 
 class RedisSingleNodeClientTestCase(TestCase):
@@ -78,4 +78,21 @@ class RedisNoneClientTestCase(TestCase):
 
         expect(str(err.exception)).to_equal(
             "redis-mode must be either single_node or sentinel"
+        )
+
+
+class RedisConnectionMetricsTestCase(TestCase):
+    def test_should_send_redis_connection_metrics(self):
+        config.redis_host = "localhost"
+        config.redis_port = 6379
+        config.redis_database = 0
+        config.redis_password = "superpassword"
+        config.redis_mode = "single_node"
+        context.metrics = mock.Mock()
+
+        client = redis_client()
+        expect(client).not_to_be_null()
+
+        context.metrics.timing.assert_any_call(
+            "worker.redis_connection.time", mock.ANY
         )

@@ -4,16 +4,18 @@
 
 import time
 import json
+from unittest import mock
 
 from thumbor.testing import TestCase
 from tornado.testing import gen_test
 from preggy import expect
 
 from remotecv.result_store.redis_store import ResultStore
-from remotecv.utils import config, redis_client
+from remotecv.utils import context, config, redis_client
 
 
 class RedisStorageTestCase(TestCase):
+
     @gen_test
     async def test_should_be_none_when_not_available(self):
         config.redis_host = "localhost"
@@ -24,7 +26,6 @@ class RedisStorageTestCase(TestCase):
         config.redis_key_expire_time = 2
         points = [[0, 1, 2, 3], [0, 2, 3, 4]]
         client = redis_client()
-
         result_store = ResultStore(config)
 
         value = client.get("thumbor-detector-key")
@@ -58,3 +59,15 @@ class RedisStorageTestCase(TestCase):
 
         value = client.get("thumbor-detector-key")
         expect(value).to_be_null()
+
+    def test_should_send_store_metrics(self):
+        config.redis_key_expire_time = 2
+        result_store = ResultStore(config)
+        points = [[0, 1, 2, 3], [0, 2, 3, 4]]
+
+        context.metrics = mock.Mock()
+        result_store.store("key", points)
+
+        context.metrics.timing.assert_called_once_with(
+            "worker.store_points.time", mock.ANY
+        )

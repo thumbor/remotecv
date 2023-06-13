@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from preggy import expect
 
-from remotecv.unique_queue import UniqueQueue
-from remotecv.utils import config, redis_client
+from remotecv.unique_queue import UniqueQueue, UniqueWorker
+from remotecv.utils import context, config, redis_client
 
 
 class UniqueQueueTestCase(TestCase):
@@ -83,3 +83,29 @@ class UniqueQueueTestCase(TestCase):
         expect(value).not_to_be_null()
         expect(queue_value).to_equal(1)
         expect(queues_value).to_equal({b"foo"})
+
+    def test_should_send_metrics(self):
+        context.metrics = mock.Mock()
+        self.unique_queue.del_unique_key("foo", "bar")
+
+        context.metrics.timing.assert_called_once_with(
+            "worker.del_unique_key.time", mock.ANY
+        )
+
+
+class UniqueWorkerTestCase(TestCase):
+    def setUp(self):
+        redis = redis_client()
+        self.unique_queue = UniqueWorker(
+            queues=["Detect"],
+            server=redis,
+            timeout=None,
+        )
+
+    def test_should_send_queue_metrics(self):
+        context.metrics = mock.Mock()
+        self.unique_queue.reserve(timeout=1)
+
+        context.metrics.timing.assert_called_once_with(
+            "worker.read_queue.time", mock.ANY
+        )

@@ -124,6 +124,13 @@ def import_modules():
     help="Redis mode",
 )
 @optgroup.option(
+    "--redis-key-expire-time",
+    envvar="REDIS_KEY_EXPIRE_TIME",
+    show_envvar=True,
+    default=1209600,
+    help="Redis key expiration time in seconds",
+)
+@optgroup.option(
     "--sentinel-instances",
     envvar="REDIS_SENTINEL_INSTANCES",
     show_envvar=True,
@@ -293,6 +300,7 @@ def main(**params):
     config.redis_database = params["database"]
     config.redis_password = params["password"]
     config.redis_mode = params["redis_mode"]
+    config.redis_key_expire_time = params["redis_key_expire_time"]
     config.redis_sentinel_instances = params["sentinel_instances"]
     config.redis_sentinel_password = params["sentinel_password"]
     config.redis_sentinel_socket_timeout = params["socket_timeout"]

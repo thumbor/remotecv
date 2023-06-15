@@ -4,7 +4,6 @@ from remotecv.utils import logger, redis_client
 
 class ResultStore(BaseStore):
 
-    WEEK = 604800
     redis_instance = None
 
     def __init__(self, config):
@@ -12,14 +11,16 @@ class ResultStore(BaseStore):
 
         if not ResultStore.redis_instance:
             ResultStore.redis_instance = redis_client()
+
+        self.redis_key_expire_time = config.redis_key_expire_time
         self.storage = ResultStore.redis_instance
 
     def store(self, key, points):
         result = self.serialize(points)
         logger.debug("Points found: %s", result)
         redis_key = f"thumbor-detector-{key}"
-        self.storage.setex(
+        self.storage.set(
             name=redis_key,
             value=result,
-            time=2 * self.WEEK,
+            ex=self.redis_key_expire_time,
         )

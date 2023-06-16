@@ -3,6 +3,7 @@
 
 
 import time
+import json
 
 from thumbor.testing import TestCase
 from tornado.testing import gen_test
@@ -32,11 +33,25 @@ class RedisStorageTestCase(TestCase):
         result_store.store("key", points)
 
         value = client.get("thumbor-detector-key")
-        points_serialized = (b'[{"x": 1.0, "y": 2.5, "height": 2,' +
-                             b' "width": 3, "origin": "", "z": 6},' +
-                             b' {"x": 1.5, "y": 4.0, ' +
-                             b'"height": 3, "width": 4, ' +
-                             b'"origin": "", "z": 12}]')
+        points_serialized = json.dumps([
+            {
+                "x": 1.0,
+                "y": 2.5,
+                "height": 2,
+                "width": 3,
+                "origin": "",
+                "z": 6,
+            },
+            {
+                "x": 1.5,
+                "y": 4.0,
+                "height": 3,
+                "width": 4,
+                "origin": "",
+                "z": 12,
+            },
+        ])
+
         expect(value).to_equal(points_serialized)
 
         time.sleep(3)

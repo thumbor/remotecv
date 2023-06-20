@@ -12,6 +12,8 @@ import logging
 
 from redis import Redis, Sentinel
 
+from remotecv.timing import get_time, get_interval
+
 
 class Config:
     pass
@@ -30,15 +32,21 @@ SENTINEL = "sentinel"
 
 
 def redis_client():
+    start_time = get_time()
     if config.redis_mode == SINGLE_NODE:
-        return __redis_single_node_client()
+        client = __redis_single_node_client()
+    elif config.redis_mode == SENTINEL:
+        client = __redis_sentinel_client()
+    else:
+        raise AttributeError(
+            f"redis-mode must be either {SINGLE_NODE} or {SENTINEL}"
+        )
 
-    if config.redis_mode == SENTINEL:
-        return __redis_sentinel_client()
-
-    raise AttributeError(
-        f"redis-mode must be either {SINGLE_NODE} or {SENTINEL}"
+    context.metrics.timing(
+        "worker.redis_connection.time", get_interval(start_time, get_time()),
     )
+
+    return client
 
 
 def __redis_sentinel_client():

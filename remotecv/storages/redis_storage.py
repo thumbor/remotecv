@@ -52,7 +52,6 @@ class Storage:
         )
 
     def __redis_sentinel_client(self):
-
         instances_split = (
             self.context.config.REDIS_QUEUE_SENTINEL_INSTANCES.split(",")
         )

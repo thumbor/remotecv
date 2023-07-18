@@ -268,6 +268,14 @@ def import_modules():
     help="Timeout in seconds for image detection",
 )
 @optgroup.option(
+    "--worker-ttl",
+    envvar="WORKER_TTL",
+    show_envvar=True,
+    default=None,
+    type=click.INT,
+    help="TTL in seconds for worker",
+)
+@optgroup.option(
     "--sentry-url",
     envvar="SENTRY_URL",
     show_envvar=True,
@@ -314,6 +322,7 @@ def main(**params):
     config.polling_interval = params["polling_interval"]
 
     config.timeout = params["timeout"]
+    config.worker_ttl = params["worker_ttl"]
     config.server_port = params["server_port"]
     config.log_level = params["level"].upper()
     config.loader = import_module(params["loader"])

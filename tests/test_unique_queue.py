@@ -95,10 +95,10 @@ class UniqueQueueTestCase(TestCase):
 
 class UniqueWorkerTestCase(TestCase):
     def setUp(self):
-        redis = redis_client()
+        self.redis = redis_client()
         self.unique_queue = UniqueWorker(
             queues=["Detect"],
-            server=redis,
+            server=self.redis,
             timeout=None,
         )
 
@@ -109,3 +109,19 @@ class UniqueWorkerTestCase(TestCase):
         context.metrics.timing.assert_called_once_with(
             "worker.read_queue.time", mock.ANY
         )
+
+    def test_should_create_unique_worker_without_ttl(self):
+        config.worker_ttl = None
+        worker = UniqueWorker(server=self.redis, queues=["Detect"])
+        worker.register_worker()
+        expect(
+            self.redis.ttl(f"resque:worker:{str(worker)}:started")
+        ).to_equal(-1)
+
+    def test_should_create_unique_worker_with_ttl(self):
+        config.worker_ttl = 60
+        worker = UniqueWorker(server=self.redis, queues=["Detect"])
+        worker.register_worker()
+        expect(
+            self.redis.ttl(f"resque:worker:{str(worker)}:started")
+        ).Not.to_equal(-1)

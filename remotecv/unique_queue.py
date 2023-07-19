@@ -2,7 +2,7 @@ from pyres import ResQ
 from pyres.worker import Worker
 
 from remotecv.timing import get_time, get_interval
-from remotecv.utils import context, logger
+from remotecv.utils import config, context, logger
 
 
 class UniqueQueue(ResQ):
@@ -84,3 +84,10 @@ class UniqueWorker(Worker):
             get_interval(start_time, get_time()),
         )
         return job
+
+    def register_worker(self):
+        super().register_worker()
+        if config.worker_ttl:
+            self.resq.redis.expire(
+                f"resque:worker:{str(self)}:started", config.worker_ttl
+            )

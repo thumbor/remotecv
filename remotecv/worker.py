@@ -276,6 +276,14 @@ def import_modules():
     help="TTL in seconds for worker",
 )
 @optgroup.option(
+    "--prune-dead-members",
+    envvar="PRUNE_DEAD_MEMBERS",
+    show_envvar=True,
+    is_flag=True,
+    default=False,
+    help="Prune dead members on startup",
+)
+@optgroup.option(
     "--sentry-url",
     envvar="SENTRY_URL",
     show_envvar=True,
@@ -323,6 +331,7 @@ def main(**params):
 
     config.timeout = params["timeout"]
     config.worker_ttl = params["worker_ttl"]
+    config.prune_dead_members = params["prune_dead_members"]
     config.server_port = params["server_port"]
     config.log_level = params["level"].upper()
     config.loader = import_module(params["loader"])

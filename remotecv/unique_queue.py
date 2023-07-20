@@ -91,3 +91,9 @@ class UniqueWorker(Worker):
             self.resq.redis.expire(
                 f"resque:worker:{str(self)}:started", config.worker_ttl
             )
+
+    def startup(self):
+        if config.prune_dead_members:
+            self.resq.redis.delete("resque:workers")
+
+        super().startup()

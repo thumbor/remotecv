@@ -125,3 +125,28 @@ class UniqueWorkerTestCase(TestCase):
         expect(
             self.redis.ttl(f"resque:worker:{str(worker)}:started")
         ).Not.to_equal(-1)
+
+    def test_should_prune_dead_members_on_startup(self):
+        config.prune_dead_members = True
+        worker = UniqueWorker(server=self.redis, queues=["Detect"])
+        self.redis.sadd("resque:workers", "teste:1:Detect")
+
+        members = self.redis.smembers("resque:workers")
+        expect(len(members)).to_be_greater_than(1)
+
+        worker.startup()
+
+        members = self.redis.smembers("resque:workers")
+        expect(len(members)).to_equal(1)
+        expect(str(worker).encode() in members).to_be_true()
+
+    def test_should_not_prune_dead_members_on_startup(self):
+        config.prune_dead_members = False
+        worker = UniqueWorker(server=self.redis, queues=["Detect"])
+        self.redis.sadd("resque:workers", "teste:1:Detect")
+
+        worker.startup()
+
+        members = self.redis.smembers("resque:workers")
+        expect(len(members)).to_equal(2)
+        expect(str(worker).encode() in members).to_be_true()

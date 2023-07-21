@@ -40,7 +40,7 @@ jobs:
       - name: Run Unit Tests
         run: make unit
       - name: Lint
-        run: make flake pylint
+        run: make lint
       - name: Generate lcov
         run: make coverage
       - name: Coveralls

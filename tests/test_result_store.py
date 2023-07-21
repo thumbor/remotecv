@@ -6,16 +6,15 @@ import time
 import json
 from unittest import mock
 
-from thumbor.testing import TestCase
 from tornado.testing import gen_test
 from preggy import expect
+from thumbor.testing import TestCase
 
 from remotecv.result_store.redis_store import ResultStore
 from remotecv.utils import context, config, redis_client
 
 
 class RedisStorageTestCase(TestCase):
-
     @gen_test
     async def test_should_be_none_when_not_available(self):
         config.redis_host = "localhost"
@@ -34,24 +33,26 @@ class RedisStorageTestCase(TestCase):
         result_store.store("key", points)
 
         value = client.get("thumbor-detector-key")
-        points_serialized = json.dumps([
-            {
-                "x": 1.0,
-                "y": 2.5,
-                "height": 2,
-                "width": 3,
-                "origin": "",
-                "z": 6,
-            },
-            {
-                "x": 1.5,
-                "y": 4.0,
-                "height": 3,
-                "width": 4,
-                "origin": "",
-                "z": 12,
-            },
-        ])
+        points_serialized = json.dumps(
+            [
+                {
+                    "x": 1.0,
+                    "y": 2.5,
+                    "height": 2,
+                    "width": 3,
+                    "origin": "",
+                    "z": 6,
+                },
+                {
+                    "x": 1.5,
+                    "y": 4.0,
+                    "height": 3,
+                    "width": 4,
+                    "origin": "",
+                    "z": 12,
+                },
+            ]
+        )
 
         expect(value).to_equal(points_serialized)
 

@@ -16,11 +16,16 @@ coverage:
 	@coverage report -m --fail-under=52
 	@coverage lcov
 
+black:
+	@black . --config pyproject.toml
+
 flake:
 	@flake8 --config .flake8
 
 pylint:
 	@pylint remotecv tests
+
+lint: black flake pylint
 
 ci-test:
 	@if [ "$$LINT_TEST" ]; then $(MAKE) flake; else $(MAKE) unit; fi

@@ -10,4 +10,4 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"WORKING")
 
     def log_message(self, format, *args):  # pylint: disable=redefined-builtin
-        logging.info(format.replace('\"', ""), *args)
+        logging.info(format.replace('"', ""), *args)

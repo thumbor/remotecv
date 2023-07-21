@@ -6,9 +6,9 @@ import uuid
 
 from redis import RedisError
 
-from thumbor.testing import TestCase
 from tornado.testing import gen_test
 from preggy import expect
+from thumbor.testing import TestCase
 
 import remotecv.storages.redis_storage
 

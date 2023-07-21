@@ -308,7 +308,10 @@ def import_modules():
 def main(**params):
     """Runs RemoteCV"""
 
-    logging.basicConfig(level=getattr(logging, params["level"].upper()), format=params["format"])
+    logging.basicConfig(
+        level=getattr(logging, params["level"].upper()),
+        format=params["format"],
+    )
 
     config.backend = params["backend"]
     config.redis_host = params["host"]

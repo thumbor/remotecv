@@ -77,21 +77,27 @@ class FaceDetectorTestCase(TestCase):
         expect(detection_result[0][3]).to_be_numeric()
 
     def test_should_run_on_images_with_mode_l(self):
-        detection_result = FaceDetector().detect(create_image("one_face-bw.png"))
+        detection_result = FaceDetector().detect(
+            create_image("one_face-bw.png")
+        )
         expect(detection_result[0][0]).to_be_numeric()
         expect(detection_result[0][1]).to_be_numeric()
         expect(detection_result[0][2]).to_be_numeric()
         expect(detection_result[0][3]).to_be_numeric()
 
     def test_should_run_on_images_with_mode_1(self):
-        detection_result = FaceDetector().detect(create_image("one_face-bw-1.png"))
+        detection_result = FaceDetector().detect(
+            create_image("one_face-bw-1.png")
+        )
         expect(detection_result[0][0]).to_be_numeric()
         expect(detection_result[0][1]).to_be_numeric()
         expect(detection_result[0][2]).to_be_numeric()
         expect(detection_result[0][3]).to_be_numeric()
 
     def test_should_run_on_images_with_mode_la(self):
-        detection_result = FaceDetector().detect(create_image("one_face-bw-la.png"))
+        detection_result = FaceDetector().detect(
+            create_image("one_face-bw-la.png")
+        )
         expect(detection_result[0][0]).to_be_numeric()
         expect(detection_result[0][1]).to_be_numeric()
         expect(detection_result[0][2]).to_be_numeric()

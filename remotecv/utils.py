@@ -43,7 +43,8 @@ def redis_client():
         )
 
     context.metrics.timing(
-        "worker.redis_connection.time", get_interval(start_time, get_time()),
+        "worker.redis_connection.time",
+        get_interval(start_time, get_time()),
     )
 
     return client

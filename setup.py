@@ -29,7 +29,7 @@ TESTS_REQUIREMENTS = [
 
 RUNTIME_REQUIREMENTS = [
     "opencv-python-headless==4.*,>=4.2.0",
-    "Pillow>=9.0.0",
+    "Pillow==10.*,>=10.0.1",
     "pyres==1.*,>=1.5.0",
     "redis==4.*,>=4.2.0",
     "sentry-sdk==0.*,>=0.14.2",
@@ -44,7 +44,7 @@ setup(
     url="https://github.com/thumbor/remotecv",
     version=version,
     description="remotecv is an OpenCV worker for facial and feature recognition",
-    python_requires="==3.*,>=3.7.0",
+    python_requires="==3.*,>=3.8.0",
     author="Bernardo Heynemann",
     author_email="heynemann@gmail.com",
     license="MIT",
@@ -57,7 +57,6 @@ setup(
         "Operating System :: MacOS",
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",

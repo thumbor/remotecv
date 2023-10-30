@@ -31,7 +31,7 @@ RUNTIME_REQUIREMENTS = [
     "opencv-python-headless==4.*,>=4.2.0",
     "Pillow==10.*,>=10.0.1",
     "pyres==1.*,>=1.5.0",
-    "redis==4.*,>=4.2.0",
+    "redis==5.*,>=5.0.1",
     "sentry-sdk==0.*,>=0.14.2",
     "click==8.*",
     "click-option-group==0.5.*",

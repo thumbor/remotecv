@@ -118,6 +118,8 @@ Options:
     --sentry-url TEXT             Sentry URL  [env var: SENTRY_URL]
     --metrics TEXT                Metrics client, should be the full name of a
                                   python module  [env var: METRICS_CLIENT]
+    --clear-image-metadata        Clears metadata when loading image
+                                  [env var: CLEAR_IMAGE_METADATA]
   Memcached store arguments:
     --memcached-hosts TEXT        Comma separated list of memcached hosts
                                   [env var: MEMCACHED_HOSTS]

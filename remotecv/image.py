@@ -2,6 +2,8 @@ from io import BytesIO
 
 from PIL import Image as PilImage
 
+from remotecv.utils import config
+
 PilImage.IGNORE_DECODING_ERRORS = True
 PilImage.MAXBLOCK = 2**25
 
@@ -23,4 +25,20 @@ class Image:
             img.load()
         except IOError:
             pass
-        return img
+
+        return self.clear_metadata(img)
+
+    def clear_metadata(self, image):
+        if (
+            not hasattr(config, "clear_image_metadata")
+            or not config.clear_image_metadata
+        ):
+            return image
+
+        if hasattr(image, "tag"):
+            image.tag.clear()
+
+        if hasattr(image, "tag_v2"):
+            image.tag_v2.clear()
+
+        return image

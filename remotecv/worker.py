@@ -297,6 +297,14 @@ def import_modules():
     default="remotecv.metrics.logger_metrics",
     help="Metrics client, should be the full name of a python module",
 )
+@optgroup.option(
+    "--clear-image-metadata",
+    envvar="CLEAR_IMAGE_METADATA",
+    show_envvar=True,
+    is_flag=True,
+    default=False,
+    help="Clears metadata when loading image",
+)
 @optgroup.group("Memcached store arguments")
 @optgroup.option(
     "--memcached-hosts",
@@ -335,6 +343,7 @@ def main(**params):
     config.timeout = params["timeout"]
     config.worker_ttl = params["worker_ttl"]
     config.prune_dead_members = params["prune_dead_members"]
+    config.clear_image_metadata = params["clear_image_metadata"]
     config.server_port = params["server_port"]
     config.log_level = params["level"].upper()
     config.loader = import_module(params["loader"])

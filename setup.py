@@ -13,28 +13,28 @@ with open("remotecv/__init__.py", encoding="utf-8") as f:
 
 
 TESTS_REQUIREMENTS = [
-    "black==22.*,>=22.1.0",
-    "celery==5.*,>=5.2.7",
-    "coverage==6.*,>=6.3.2",
-    "flake8==6.*,>=6.1.0",
-    "pre-commit==2.*,>=2.20.0",
+    "black==23.*,>=23.12.1",
+    "celery==5.*,>=5.3.6",
+    "coverage==7.*,>=7.4.0",
+    "flake8==7.*,>=7.0.0",
+    "pre-commit==3.*,>=3.6.0",
     "preggy==1.*,>=1.4.4",
-    "pylint==3.*,>=3.0.1",
-    "pyssim==0.*,>=0.4",
-    "pytest-asyncio==0.*,>=0.18.0",
-    "pytest-cov==3.*,>=3.0.0",
-    "pytest==7.*,>=7.0.0",
-    "thumbor==7.*",
+    "pylint==3.*,>=3.0.3",
+    "pyssim==0.*,>=0.7",
+    "pytest-asyncio==0.*,>=0.23.0",
+    "pytest-cov==4.*,>=4.1.0",
+    "pytest==7.*,>=7.4.0",
+    "thumbor==7.*,>=7.7.2",
 ]
 
 RUNTIME_REQUIREMENTS = [
-    "opencv-python-headless==4.*,>=4.2.0",
-    "Pillow==10.*,>=10.0.1",
-    "pyres==1.*,>=1.5.0",
+    "opencv-python-headless==4.*,>=4.9.0.80",
+    "Pillow==10.*,<10.1.0",
+    "pyres==1.*,>=1.5",
     "redis==5.*,>=5.0.1",
-    "sentry-sdk==0.*,>=0.14.2",
-    "click==8.*",
-    "click-option-group==0.5.*",
+    "sentry-sdk==1.*,>=1.39.1",
+    "click==8.*,>=8.1.7",
+    "click-option-group==0.*,>=0.5.6",
 ]
 
 setup(
@@ -44,7 +44,7 @@ setup(
     url="https://github.com/thumbor/remotecv",
     version=version,
     description="remotecv is an OpenCV worker for facial and feature recognition",
-    python_requires="==3.*,>=3.8.0",
+    python_requires="==3.*,>=3.9.0",
     author="Bernardo Heynemann",
     author_email="heynemann@gmail.com",
     license="MIT",
@@ -57,7 +57,6 @@ setup(
         "Operating System :: MacOS",
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",

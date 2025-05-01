@@ -24,12 +24,12 @@ TESTS_REQUIREMENTS = [
     "pytest-asyncio==0.*,>=0.23.0",
     "pytest-cov==4.*,>=4.1.0",
     "pytest==7.*,>=7.4.0",
-    "thumbor==7.*,>=7.7.2",
+    "thumbor==7.*,>=7.7.5",
 ]
 
 RUNTIME_REQUIREMENTS = [
     "opencv-python-headless==4.*,>=4.9.0.80",
-    "Pillow==10.*,<10.1.0",
+    "Pillow==10.*",
     "pyres==1.*,>=1.5",
     "redis==5.*,>=5.0.1",
     "sentry-sdk==1.*,>=1.39.1",

@@ -31,7 +31,7 @@ ci-test:
 	@if [ "$$LINT_TEST" ]; then $(MAKE) flake; else $(MAKE) unit; fi
 
 run-redis:
-	@docker-compose up -d $(REDIS_CONTAINER)
+	@docker compose up -d $(REDIS_CONTAINER)
 
 stop-redis:
-	@docker-compose stop $(REDIS_CONTAINER)
+	@docker compose stop $(REDIS_CONTAINER)

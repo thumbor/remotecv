@@ -3,7 +3,6 @@ from remotecv.utils import logger
 
 
 class ResultStore(BaseStore):
-
     WEEK = 604800
     memcache_instance = None
 

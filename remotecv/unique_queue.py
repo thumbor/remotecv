@@ -62,7 +62,7 @@ class UniqueWorker(Worker):
         password=None,
         timeout=None,
         after_fork=None,
-    ):
+    ):  # pylint: disable=too-many-positional-arguments
         self.after_fork_fn = after_fork
         super().__init__(queues, UniqueQueue(server=server), password, timeout)
 

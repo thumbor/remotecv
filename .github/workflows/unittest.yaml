@@ -31,7 +31,7 @@ jobs:
           key: ubuntu-22.04-${{ env.pythonLocation }}-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}
       - name: Install remotecv
         run: pip install --upgrade --upgrade-strategy eager -e .[dev]
-      - run: docker-compose pull
+      - run: docker compose pull
       - uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
       - name: Start Redis

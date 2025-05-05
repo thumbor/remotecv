@@ -69,7 +69,7 @@ class CascadeLoaderDetector(BaseDetector):
         )
         faces_scaled = []
 
-        for (left, top, width, height) in faces:
+        for left, top, width, height in faces:
             faces_scaled.append(
                 ((left.item(), top.item(), width.item(), height.item()), 0)
             )

@@ -25,9 +25,9 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U pip
-          pip install wheel
+          pip install wheel build
       - name: Build package
-        run: python setup.py sdist bdist_wheel
+        run: python -m build --sdist --wheel
       - name: Publish a Python distribution to PyPI
         if: github.event_name != 'pull_request'
         uses: pypa/gh-action-pypi-publish@v1.13.0

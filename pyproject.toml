@@ -1,4 +1,84 @@
+[build-system]
+requires = ["setuptools>=78.1.1", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "remotecv"
+version = "5.1.9"
+license = { text = "MIT" }
+description = "remotecv is an OpenCV worker for facial and feature recognition"
+readme = "README.md"
+requires-python = ">=3.10,<3.15"
+authors = [{ name = "Bernardo Heynemann", email = "heynemann@gmail.com" }]
+keywords = ["opencv", "facial-recognition", "feature-recognition", "worker"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+  "Topic :: Multimedia :: Graphics :: Presentation",
+]
+
+dependencies = [
+  "click-option-group>=0.5.6,<0.6.0",
+  "click>=8.1.7,<9",
+  "opencv-python-headless>=4.9.0.80,<5",
+  "Pillow>=10.4.0,<13",
+  "pyres>=1.5,<2",
+  "redis==5.0.1",
+  "sentry-sdk>=1.39.1,<2",
+]
+
+[project.urls]
+Homepage = "https://github.com/thumbor/remotecv"
+
+[project.optional-dependencies]
+dev = [
+  "black>=23.12.1,<24",
+  "celery>=5.3.6,<6",
+  "coverage>=7.4.0,<8",
+  "flake8>=7.0.0,<8",
+  "pre-commit>=3.6.0,<4",
+  "preggy>=1.4.4,<2",
+  "pylint>=3.0.3,<4",
+  "pyssim>=0.7,<1",
+  "pytest-asyncio>=0.23.0,<1",
+  "pytest-cov>=4.1.0,<5",
+  "pytest>=7.4.0,<8",
+  "thumbor>=7.7.7,<8",
+]
+
+[project.scripts]
+remotecv = "remotecv.worker:main"
+
+[tool.setuptools.packages.find]
+include = [
+  "remotecv",
+  "remotecv.detectors",
+  "remotecv.detectors.complete_detector",
+  "remotecv.detectors.face_detector",
+  "remotecv.detectors.feature_detector",
+  "remotecv.detectors.glasses_detector",
+  "remotecv.detectors.profile_detector",
+  "remotecv.metrics",
+  "remotecv.result_store",
+]
+
+[tool.setuptools.package-data]
+"remotecv.detectors.face_detector" = ["*.xml"]
+"remotecv.detectors.glasses_detector" = ["*.xml"]
+"remotecv.detectors.profile_detector" = ["*.xml"]
+
 [tool.black]
 line-length = 79
-target-version = ['py37']
-include = '\.pyi?$'
+target-version = ["py310"]

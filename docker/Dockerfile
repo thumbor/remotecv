@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION
-FROM python:${PYTHON_VERSION}-bullseye AS builder-image
+FROM python:${PYTHON_VERSION}-trixie AS builder-image
 
 ARG TARGETPLATFORM
 ARG DEBIAN_FRONTEND=noninteractive
@@ -18,7 +18,7 @@ ENV PATH="/home/remotecv/venv/bin:$PATH"
 RUN pip3 install --no-cache-dir wheel && \
     pip3 install --no-cache-dir remotecv==${REMOTECV_VERSION}
 
-FROM python:${PYTHON_VERSION}-slim-bullseye AS runner-image
+FROM python:${PYTHON_VERSION}-slim-trixie AS runner-image
 
 RUN apt-get update && \
     apt-get -y upgrade && \

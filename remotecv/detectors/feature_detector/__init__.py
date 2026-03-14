@@ -24,7 +24,7 @@ class FeatureDetector(BaseDetector):
         if corners is None:
             return None
 
-        corners = np.int0(corners)
+        corners = corners.astype(np.intp)
 
         if corners is not None and len(corners) > 0:
             points = []

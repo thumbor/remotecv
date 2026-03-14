@@ -17,7 +17,7 @@ TESTS_REQUIREMENTS = [
     "celery==5.*,>=5.3.6",
     "coverage==7.*,>=7.4.0",
     "flake8==7.*,>=7.0.0",
-    "numpy>=1.26.4,<2.0.0",
+    "numpy>=1.26.4,<3.0.0",
     "pre-commit==3.*,>=3.6.0",
     "preggy==1.*,>=1.4.4",
     "pylint==3.*,>=3.0.3",
@@ -30,7 +30,7 @@ TESTS_REQUIREMENTS = [
 
 RUNTIME_REQUIREMENTS = [
     "opencv-python-headless==4.*,>=4.9.0.80",
-    "Pillow==10.*",
+    "Pillow>=10.4.0,<12.0.0",
     "pyres==1.*,>=1.5",
     "redis==5.0.1",
     "sentry-sdk==1.*,>=1.39.1",
@@ -62,6 +62,7 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Programming Language :: Python :: 3 :: Only",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
         "Topic :: Multimedia :: Graphics :: Presentation",

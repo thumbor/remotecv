@@ -65,7 +65,7 @@ def start_http_server():
     httpd = HTTPServer(("", config.server_port), HealthCheckHandler)
 
     thread = Thread(target=serve_forever, args=(httpd,))
-    thread.setDaemon(True)
+    thread.daemon = True
     thread.start()
 
 

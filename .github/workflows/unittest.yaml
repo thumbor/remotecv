@@ -24,14 +24,14 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: APT Update
         run: sudo apt-get update -y
       - name: APT Install
         run: sudo apt-get install -y --no-install-recommends libjpeg-dev
-      - uses: actions/cache@v3
+      - uses: actions/cache@v5
         with:
           path: ${{ env.pythonLocation }}
           key: ubuntu-22.04-${{ env.pythonLocation }}-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}

@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v6
         with:
           python-version: "3.10"
       - name: Install dependencies
@@ -66,11 +66,11 @@ jobs:
         run: echo "CACHE_TO=type=registry,ref=ghcr.io/thumbor/remotecv:buildcache-${{ matrix.python_version }},mode=max" >> $GITHUB_ENV
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v4
 
       - name: Login to GHCR
         if: github.event_name != 'pull_request'

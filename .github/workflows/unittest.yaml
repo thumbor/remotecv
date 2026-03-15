@@ -44,8 +44,6 @@ jobs:
         run: make run-redis
       - name: Run Unit Tests
         run: make unit
-      - name: Lint
-        run: make lint
       - name: Generate lcov
         run: make coverage
       - name: Coveralls

@@ -1,7 +1,7 @@
 from celery import Celery
 
 from remotecv.pyres_tasks import DetectTask
-from remotecv.timing import get_time, get_interval
+from remotecv.timing import get_interval, get_time
 from remotecv.utils import context
 
 

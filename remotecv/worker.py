@@ -20,7 +20,7 @@ from click_option_group import optgroup
 from remotecv.error_handler import ErrorHandler
 from remotecv.healthcheck import HealthCheckHandler
 from remotecv.importer import Importer
-from remotecv.utils import config, redis_client, SINGLE_NODE, SENTINEL, context
+from remotecv.utils import SENTINEL, SINGLE_NODE, config, context, redis_client
 
 
 def start_pyres_worker():

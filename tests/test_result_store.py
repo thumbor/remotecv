@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 
-import time
 import json
+import time
 from unittest import mock
 
-from tornado.testing import gen_test
 from preggy import expect
 from thumbor.testing import TestCase
+from tornado.testing import gen_test
 
 from remotecv.result_store.redis_store import ResultStore
-from remotecv.utils import context, config, redis_client
+from remotecv.utils import config, context, redis_client
 
 
 class RedisStorageTestCase(TestCase):

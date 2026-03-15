@@ -7,7 +7,7 @@ from remotecv.detectors.feature_detector import FeatureDetector
 from remotecv.detectors.glasses_detector import GlassesDetector
 from remotecv.detectors.profile_detector import ProfileDetector
 from remotecv.image import Image
-from remotecv.timing import get_time, get_interval
+from remotecv.timing import get_interval, get_time
 from remotecv.utils import context
 
 

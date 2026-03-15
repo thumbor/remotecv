@@ -1,6 +1,6 @@
 from remotecv.image_processor import ImageProcessor
-from remotecv.timing import get_time, get_interval
-from remotecv.utils import config, logger, context
+from remotecv.timing import get_interval, get_time
+from remotecv.utils import config, context, logger
 
 # pylint: disable=no-member
 

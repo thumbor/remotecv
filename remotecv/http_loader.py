@@ -1,8 +1,8 @@
 import re
-
-from urllib.request import unquote, urlopen
 from urllib.parse import urlparse
-from remotecv.timing import get_time, get_interval
+from urllib.request import unquote, urlopen
+
+from remotecv.timing import get_interval, get_time
 from remotecv.utils import context
 
 

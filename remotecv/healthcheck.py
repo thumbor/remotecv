@@ -1,5 +1,5 @@
-from http.server import BaseHTTPRequestHandler
 import logging
+from http.server import BaseHTTPRequestHandler
 
 
 class HealthCheckHandler(BaseHTTPRequestHandler):

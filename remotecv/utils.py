@@ -12,7 +12,7 @@ import logging
 
 from redis import Redis, Sentinel
 
-from remotecv.timing import get_time, get_interval
+from remotecv.timing import get_interval, get_time
 
 
 class Config:

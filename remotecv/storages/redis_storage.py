@@ -11,10 +11,9 @@
 
 from json import loads
 
+from redis import RedisError
 from redis.asyncio import Redis
 from redis.asyncio.sentinel import Sentinel
-from redis import RedisError
-
 
 SINGLE_NODE = "single_node"
 SENTINEL = "sentinel"

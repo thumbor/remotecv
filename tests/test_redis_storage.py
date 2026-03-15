@@ -4,11 +4,10 @@
 
 import uuid
 
-from redis import RedisError
-
-from tornado.testing import gen_test
 from preggy import expect
+from redis import RedisError
 from thumbor.testing import TestCase
+from tornado.testing import gen_test
 
 import remotecv.storages.redis_storage
 

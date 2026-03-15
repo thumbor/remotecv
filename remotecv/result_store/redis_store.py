@@ -1,5 +1,5 @@
 from remotecv.result_store import BaseStore
-from remotecv.timing import get_time, get_interval
+from remotecv.timing import get_interval, get_time
 from remotecv.utils import context, logger, redis_client
 
 

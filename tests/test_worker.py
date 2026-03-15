@@ -3,8 +3,8 @@
 
 from unittest import TestCase, mock
 
-from preggy import expect
 from click.testing import CliRunner
+from preggy import expect
 
 from remotecv import worker
 

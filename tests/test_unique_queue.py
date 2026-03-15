@@ -6,7 +6,7 @@ from unittest import TestCase, mock
 from preggy import expect
 
 from remotecv.unique_queue import UniqueQueue, UniqueWorker
-from remotecv.utils import context, config, redis_client
+from remotecv.utils import config, context, redis_client
 
 
 class UniqueQueueTestCase(TestCase):

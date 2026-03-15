@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "remotecv"
-version = "5.1.9"
+version = "5.2.0"
 license = { text = "MIT" }
 description = "remotecv is an OpenCV worker for facial and feature recognition"
 readme = "README.md"

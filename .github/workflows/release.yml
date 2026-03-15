@@ -66,7 +66,7 @@ jobs:
         run: echo "CACHE_TO=type=registry,ref=ghcr.io/thumbor/remotecv:buildcache-${{ matrix.python_version }},mode=max" >> $GITHUB_ENV
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
         id: buildx

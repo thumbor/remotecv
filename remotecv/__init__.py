@@ -1,1 +1,7 @@
-__version__ = "5.1.9"
+from importlib.metadata import PackageNotFoundError, version
+
+
+try:
+    __version__ = version("remotecv")
+except PackageNotFoundError:
+    __version__ = "0+unknown"

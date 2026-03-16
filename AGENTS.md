@@ -3,8 +3,8 @@
 remotecv is a Python worker service that performs OpenCV-based image
 detection jobs outside the main application flow. It is commonly used by
 thumbor to offload face and feature detection, but it can also be integrated
-into other systems. The worker supports Redis/PyRes and Celery/SQS backends,
-optional healthchecks, and pluggable metrics/result stores.
+into other systems. The worker runs on Celery with a Redis or SQS broker and
+supports optional healthchecks and pluggable metrics/result stores.
 
 ## Dev environment setup
 
@@ -49,13 +49,14 @@ optional healthchecks, and pluggable metrics/result stores.
 
   ```
   uv run --locked remotecv --with-healthcheck --server-port=8888
-  uv run --locked remotecv --backend=pyres
-  uv run --locked remotecv --backend=celery
+  uv run --locked remotecv --broker=redis
+  uv run --locked remotecv --broker=sqs
   ```
 
-- Redis/PyRes is the default backend. Celery mode expects AWS/SQS-related
-  environment variables such as `AWS_REGION`, `AWS_ACCESS_KEY_ID`, and
-  `AWS_SECRET_ACCESS_KEY`.
+- Redis is the default broker. The SQS broker needs the `sqs` extra
+  (`uv sync --locked --extra sqs`) and reads `AWS_REGION`,
+  `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY`. With the keys unset, boto3
+  falls back to its default credential chain.
 
 ## Running tests
 
@@ -103,12 +104,12 @@ optional healthchecks, and pluggable metrics/result stores.
 
 ```
 remotecv/                     <- main package
-  worker.py                   <- CLI entry point and backend/bootstrap wiring
+  worker.py                   <- CLI entry point and broker/bootstrap wiring
   image_processor.py          <- detector orchestration
   image.py                    <- image loading and normalization helpers
   http_loader.py              <- remote image fetching
-  unique_queue.py             <- PyRes worker implementation
-  celery_tasks.py             <- Celery/SQS worker integration
+  tasks.py                    <- detection job run by the worker
+  celery_tasks.py             <- Celery tasks, broker settings, job dedup
   error_handler.py            <- Sentry/error handling integration
   healthcheck.py              <- optional HTTP healthcheck handler
   importer.py                 <- dynamic class loading utilities
@@ -141,5 +142,5 @@ Makefile                      <- primary task runner
   stability-sensitive; keep them updated when touching packaging.
 - Restrict access to Redis/SQS and any healthcheck port in production.
 - If you modify queueing or result-storage behavior, validate both the runtime
-  code and the corresponding tests (`test_pyres_tasks.py`,
+  code and the corresponding tests (`test_celery_tasks.py`, `test_tasks.py`,
   `test_redis.py`, `test_result_store.py`, `test_redis_storage.py`).

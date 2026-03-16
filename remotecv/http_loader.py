@@ -1,6 +1,6 @@
 import re
 from http.client import InvalidURL
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import HTTPRedirectHandler, build_opener, unquote
 
@@ -68,6 +68,11 @@ def load_sync(path):
         response = opener.open(
             path, timeout=getattr(config, "loader_timeout", DEFAULT_TIMEOUT)
         )
+    except HTTPError as error:
+        # HTTPError holds the response, which cannot be pickled, and Celery
+        # logs a failure it cannot pickle as a bare OSError().
+        error.close()
+        raise URLError(str(error)) from None
     except (InvalidURL, ValueError):
         # urllib echoes the URL, userinfo and query included, in these.
         raise ValueError(f"invalid image URL {redact_url(path)}") from None

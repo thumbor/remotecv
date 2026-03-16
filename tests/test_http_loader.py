@@ -7,6 +7,7 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2026 Marcelo Jorge Vieira <metal@alucinados.com>
 
+import pickle
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
@@ -101,6 +102,13 @@ class HttpLoaderTestCase(TestCase):
     def test_should_refuse_non_http_scheme(self):
         with self.assertRaisesRegex(URLError, "unsupported scheme: httpx"):
             load_sync("httpx://127.0.0.1/small")
+
+    def test_should_keep_http_status_in_pickled_error(self):
+        with self.assertRaises(URLError) as error:
+            load_sync(f"{self.base_url}/missing")
+
+        unpickled = pickle.loads(pickle.dumps(error.exception))
+        assert "HTTP Error 404" in str(unpickled)
 
     def test_should_allow_body_within_limit(self):
         config.loader_max_body_size = len(LARGE_BODY)

@@ -1,10 +1,9 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import numbers
 from unittest import TestCase, mock
 
-from remotecv.pyres_tasks import DetectTask
+from remotecv.tasks import DetectTask
 from remotecv.utils import config
 from tests import read_fixture
 

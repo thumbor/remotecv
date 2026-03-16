@@ -1,7 +1,10 @@
-from unittest import TestCase
+from io import BytesIO
+from unittest import TestCase, mock
 
+from PIL import Image as PilImage
 from preggy import expect
 
+from remotecv.image import Image
 from remotecv.utils import config
 from tests import create_image
 
@@ -37,3 +40,29 @@ class ImageTest(TestCase):
         expect(image.tag).Not.to_equal({})
         expect(image.tag_v2).Not.to_equal({})
         expect(image.size).to_equal((41, 48))
+
+    def test_should_handle_ioerror_on_image_load(self):
+        pil_img = mock.MagicMock(spec=PilImage.Image)
+        pil_img.is_animated = False
+        pil_img.load.side_effect = IOError("truncated")
+
+        with mock.patch("remotecv.image.PilImage.open", return_value=pil_img):
+            img = Image.create_from_buffer(b"data")
+
+        # Should still return the image (IOError on load is non-fatal)
+        expect(img).not_to_be_null()
+
+    def test_should_clear_metadata_without_tag_attributes(self):
+        config.clear_image_metadata = True
+        pil_img = mock.MagicMock(spec=PilImage.Image)
+        # spec=PilImage.Image means hasattr checks use the real class attrs;
+        # delete them on the instance to exercise the False branches
+        del pil_img.tag
+        del pil_img.tag_v2
+        pil_img.is_animated = False
+        pil_img.load.return_value = None
+
+        with mock.patch("remotecv.image.PilImage.open", return_value=pil_img):
+            img = Image.create_from_buffer(b"data")
+
+        expect(img).not_to_be_null()

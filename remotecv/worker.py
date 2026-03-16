@@ -20,26 +20,7 @@ from click_option_group import optgroup
 from remotecv.error_handler import ErrorHandler
 from remotecv.healthcheck import HealthCheckHandler
 from remotecv.importer import Importer
-from remotecv.utils import SENTINEL, SINGLE_NODE, config, context, redis_client
-
-
-def start_pyres_worker():
-    from remotecv.unique_queue import (  # NOQA pylint: disable=import-outside-toplevel
-        UniqueWorker,
-    )
-
-    redis = redis_client()
-
-    def after_fork(_):
-        config.error_handler.install_handler()
-
-    worker = UniqueWorker(
-        queues=["Detect"],
-        server=redis,
-        timeout=config.timeout,
-        after_fork=after_fork,
-    )
-    worker.work()
+from remotecv.utils import SENTINEL, SINGLE_NODE, config, context
 
 
 def start_celery_worker():
@@ -76,17 +57,7 @@ def import_modules():
 
 
 @click.command()
-@optgroup.group("Worker Backend")
-@optgroup.option(
-    "-b",
-    "--backend",
-    envvar="BACKEND",
-    show_envvar=True,
-    default="pyres",
-    type=click.Choice(["pyres", "celery"]),
-    help="Worker backend",
-)
-@optgroup.group("Pyres Connection Arguments")
+@optgroup.group("Redis Connection Arguments")
 @optgroup.option(
     "--host",
     envvar="REDIS_HOST",
@@ -268,22 +239,6 @@ def import_modules():
     help="Timeout in seconds for image detection",
 )
 @optgroup.option(
-    "--worker-ttl",
-    envvar="WORKER_TTL",
-    show_envvar=True,
-    default=None,
-    type=click.INT,
-    help="TTL in seconds for worker",
-)
-@optgroup.option(
-    "--prune-dead-members",
-    envvar="PRUNE_DEAD_MEMBERS",
-    show_envvar=True,
-    is_flag=True,
-    default=False,
-    help="Prune dead members on startup",
-)
-@optgroup.option(
     "--sentry-url",
     envvar="SENTRY_URL",
     show_envvar=True,
@@ -321,7 +276,6 @@ def main(**params):
         format=params["format"],
     )
 
-    config.backend = params["backend"]
     config.redis_host = params["host"]
     config.redis_port = params["port"]
     config.redis_database = params["database"]
@@ -341,8 +295,6 @@ def main(**params):
     config.polling_interval = params["polling_interval"]
 
     config.timeout = params["timeout"]
-    config.worker_ttl = params["worker_ttl"]
-    config.prune_dead_members = params["prune_dead_members"]
     config.clear_image_metadata = params["clear_image_metadata"]
     config.server_port = params["server_port"]
     config.log_level = params["level"].upper()
@@ -362,10 +314,7 @@ def main(**params):
     if params["with_healthcheck"]:
         start_http_server()
 
-    if params["backend"] == "pyres":
-        start_pyres_worker()
-    elif params["backend"] == "celery":
-        start_celery_worker()
+    start_celery_worker()
 
 
 if __name__ == "__main__":

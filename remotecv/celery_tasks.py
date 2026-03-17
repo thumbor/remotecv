@@ -36,24 +36,13 @@ class CeleryUniqueQueue:
 
 
 class CeleryTasks:
-    def __init__(
-        self,
-        key_id,
-        key_secret,
-        region,
-        timeout=None,
-        polling_interval=None,
-    ):  # pylint: disable=too-many-positional-arguments
-        self.celery = Celery(broker=f"sqs://{key_id}:{key_secret}@")
+    def __init__(self, broker_url, broker_transport_options=None):
+        self.celery = Celery(broker=broker_url)
 
-        self.celery.conf.update(
-            BROKER_TRANSPORT_OPTIONS={
-                "region": region,
-                "visibility_timeout": timeout or 120,
-                "polling_interval": polling_interval or 20,
-                "queue_name_prefix": "celery-remotecv-",
-            }
-        )
+        if broker_transport_options:
+            self.celery.conf.update(
+                BROKER_TRANSPORT_OPTIONS=broker_transport_options
+            )
         self.unique_queue = CeleryUniqueQueue(redis_client())
         self._detect_task = None
 

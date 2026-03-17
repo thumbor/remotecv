@@ -95,7 +95,7 @@ class CeleryTasksTestCase(TestCase):
             with mock.patch(
                 "remotecv.celery_tasks.Celery", return_value=celery_instance
             ):
-                return CeleryTasks("key_id", "key_secret", "us-east-1")
+                return CeleryTasks("redis://localhost:6380/0")
 
     def test_enqueue_unique_calls_apply_async(self):
         celery_tasks = self._make_celery_tasks()
@@ -145,7 +145,7 @@ class CeleryTasksTestCase(TestCase):
         celery_tasks.run_commands(["worker"])
 
         celery_tasks.celery.start.assert_called_once_with(["worker"])
-        celery_tasks.celery.conf.update.assert_called_once()  # only BROKER_TRANSPORT_OPTIONS
+        celery_tasks.celery.conf.update.assert_not_called()
 
     def test_run_commands_with_log_level(self):
         celery_tasks = self._make_celery_tasks()

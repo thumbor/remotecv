@@ -31,11 +31,8 @@ class WorkerTestCase(TestCase):
 class StartCeleryWorkerTestCase(TestCase):
     def setUp(self):
         context.metrics = mock.Mock()
-        config.key_id = "key"
-        config.key_secret = "secret"
-        config.region = "us-east-1"
-        config.timeout = None
-        config.polling_interval = 20
+        config.broker_url = "redis://localhost:6379/0"
+        config.broker_transport_options = None
         config.extra_args = ["worker"]
         config.log_level = "INFO"
 
@@ -47,11 +44,8 @@ class StartCeleryWorkerTestCase(TestCase):
         worker.start_celery_worker()
 
         celery_tasks_mock.assert_called_once_with(
-            config.key_id,
-            config.key_secret,
-            config.region,
-            config.timeout,
-            config.polling_interval,
+            config.broker_url,
+            config.broker_transport_options,
         )
         instance.run_commands.assert_called_once_with(
             config.extra_args, log_level=config.log_level

@@ -10,7 +10,7 @@ from preggy import expect
 
 class VersionTestCase(TestCase):
     def test_version_fallback_when_package_not_found(self):
-        import remotecv
+        import remotecv  # pylint: disable=import-outside-toplevel
 
         with mock.patch(
             "importlib.metadata.version",

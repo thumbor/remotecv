@@ -19,18 +19,18 @@ class MemcacheStoreTestCase(TestCase):
         sys.modules["pylibmc"] = self.pylibmc_mock
 
         # Reset class-level cache between tests
-        from remotecv.result_store import memcache_store
+        from remotecv.result_store import memcache_store  # pylint: disable=import-outside-toplevel
 
         memcache_store.ResultStore.memcache_instance = None
 
     def tearDown(self):
         sys.modules.pop("pylibmc", None)
-        from remotecv.result_store import memcache_store
+        from remotecv.result_store import memcache_store  # pylint: disable=import-outside-toplevel
 
         memcache_store.ResultStore.memcache_instance = None
 
     def test_should_create_memcache_client(self):
-        from remotecv.result_store.memcache_store import ResultStore
+        from remotecv.result_store.memcache_store import ResultStore  # pylint: disable=import-outside-toplevel
 
         store = ResultStore(config)
 
@@ -42,7 +42,7 @@ class MemcacheStoreTestCase(TestCase):
         expect(store.storage).to_equal(self.client_mock)
 
     def test_should_reuse_existing_client(self):
-        from remotecv.result_store.memcache_store import ResultStore
+        from remotecv.result_store.memcache_store import ResultStore  # pylint: disable=import-outside-toplevel
 
         ResultStore(config)
         ResultStore(config)
@@ -50,7 +50,7 @@ class MemcacheStoreTestCase(TestCase):
         expect(self.pylibmc_mock.Client.call_count).to_equal(1)
 
     def test_should_store_points(self):
-        from remotecv.result_store.memcache_store import ResultStore
+        from remotecv.result_store.memcache_store import ResultStore  # pylint: disable=import-outside-toplevel
 
         store = ResultStore(config)
         store.store("my-key", [[0, 1, 2, 3]])

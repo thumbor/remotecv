@@ -18,7 +18,7 @@ class ErrorHandlerTestCase(TestCase):
     def test_should_init_sentry_with_url(
         self, ignore_logger_mock, sentry_mock
     ):
-        handler = ErrorHandler("https://sentry.example.com")
+        ErrorHandler("https://sentry.example.com")
 
         sentry_mock.init.assert_called_once_with(
             dsn="https://sentry.example.com", integrations=[]

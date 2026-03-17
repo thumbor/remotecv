@@ -1,4 +1,3 @@
-from io import BytesIO
 from unittest import TestCase, mock
 
 from PIL import Image as PilImage

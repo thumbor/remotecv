@@ -19,11 +19,15 @@ class CeleryUniqueQueue:
 
     def add_unique_key(self, queue, key):
         unique_key = self._create_unique_key(queue, key)
-        if self.redis.get(unique_key) == b"1":
-            # Do nothing as this message is already enqueued
-            return False
-        self.redis.set(unique_key, "1", ex=config.redis_key_expire_time)
-        return True
+        # Use an atomic SET with NX to avoid race conditions between producers.
+        # redis-py returns True if the key was set, and None if it already existed.
+        added = self.redis.set(
+            unique_key,
+            "1",
+            ex=config.redis_key_expire_time,
+            nx=True,
+        )
+        return bool(added)
 
     def del_unique_key(self, queue, key):
         start_time = get_time()

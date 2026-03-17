@@ -15,7 +15,9 @@ class ErrorHandlerTestCase(TestCase):
 
     @mock.patch("remotecv.error_handler.sentry_sdk")
     @mock.patch("remotecv.error_handler.ignore_logger")
-    def test_should_init_sentry_with_url(self, ignore_logger_mock, sentry_mock):
+    def test_should_init_sentry_with_url(
+        self, ignore_logger_mock, sentry_mock
+    ):
         handler = ErrorHandler("https://sentry.example.com")
 
         sentry_mock.init.assert_called_once_with(
@@ -84,5 +86,7 @@ class ErrorHandlerTestCase(TestCase):
 
         handler.handle_error(ValueError, ValueError("oops"), None)
 
-        sentry_mock.capture_event.assert_called_once_with(fake_event, hint=fake_hint)
+        sentry_mock.capture_event.assert_called_once_with(
+            fake_event, hint=fake_hint
+        )
         scope_mock.set_extra.assert_called_once()

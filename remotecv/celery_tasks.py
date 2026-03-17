@@ -82,7 +82,9 @@ class CeleryTasks:
         if not self.unique_queue.add_unique_key(DETECT_QUEUE, key):
             logger.debug("key %s already enqueued", key)
             return
-        self.get_detect_task().apply_async(args=[detection_type, image_path, key])
+        self.get_detect_task().apply_async(
+            args=[detection_type, image_path, key]
+        )
         logger.info("enqueued detect task for key %s", key)
 
     def run_commands(self, args, log_level=None):

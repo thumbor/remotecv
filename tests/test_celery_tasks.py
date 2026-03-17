@@ -90,7 +90,9 @@ class CeleryTasksTestCase(TestCase):
             # call the task body directly without a broker
             celery_instance.task.return_value = lambda f: f
 
-        with mock.patch("remotecv.celery_tasks.redis_client", return_value=self.client):
+        with mock.patch(
+            "remotecv.celery_tasks.redis_client", return_value=self.client
+        ):
             with mock.patch(
                 "remotecv.celery_tasks.Celery", return_value=celery_instance
             ):
@@ -113,9 +115,7 @@ class CeleryTasksTestCase(TestCase):
 
         celery_tasks.enqueue_unique("face", "image.jpg", "my-key")
 
-        value = self.client.get(
-            f"celery:unique:queue:{DETECT_QUEUE}:my-key"
-        )
+        value = self.client.get(f"celery:unique:queue:{DETECT_QUEUE}:my-key")
         expect(value).not_to_be_null()
 
     def test_enqueue_unique_skips_duplicate(self):
@@ -170,7 +170,5 @@ class CeleryTasksTestCase(TestCase):
             task_fn = celery_tasks.get_detect_task()
             task_fn("face", "image.jpg", "my-key")
 
-        value = self.client.get(
-            f"celery:unique:queue:{DETECT_QUEUE}:my-key"
-        )
+        value = self.client.get(f"celery:unique:queue:{DETECT_QUEUE}:my-key")
         expect(value).to_be_null()

@@ -64,7 +64,9 @@ class RedisSentinelClientTestCase(TestCase):
 
         expect(client).not_to_be_null()
         expect(client).to_be_instance_of(Redis)
-        expect(client.connection_pool).to_be_instance_of(SentinelConnectionPool)
+        expect(client.connection_pool).to_be_instance_of(
+            SentinelConnectionPool
+        )
 
     def test_should_connect_to_redis_sentinel_no_pass(self):
         config.redis_mode = "sentinel"
@@ -79,7 +81,9 @@ class RedisSentinelClientTestCase(TestCase):
 
         expect(client).not_to_be_null()
         expect(client).to_be_instance_of(Redis)
-        expect(client.connection_pool).to_be_instance_of(SentinelConnectionPool)
+        expect(client.connection_pool).to_be_instance_of(
+            SentinelConnectionPool
+        )
 
 
 class RedisNoneClientTestCase(TestCase):

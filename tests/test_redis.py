@@ -1,14 +1,18 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from unittest import TestCase, mock
 
 from preggy import expect
+from redis import Redis
+from redis.sentinel import SentinelConnectionPool
 
 from remotecv.utils import config, context, redis_client
 
 
 class RedisSingleNodeClientTestCase(TestCase):
+    def setUp(self):
+        context.metrics = mock.Mock()
+
     def test_should_connect_to_redis_single_node(self):
         config.redis_host = "localhost"
         config.redis_port = 6379
@@ -19,9 +23,11 @@ class RedisSingleNodeClientTestCase(TestCase):
         client = redis_client()
 
         expect(client).not_to_be_null()
-        expect(str(client)).to_equal(
-            "Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>"
-        )
+        expect(client).to_be_instance_of(Redis)
+        kwargs = client.connection_pool.connection_kwargs
+        expect(kwargs["host"]).to_equal("localhost")
+        expect(kwargs["port"]).to_equal(6379)
+        expect(kwargs["db"]).to_equal(0)
 
     def test_should_connect_to_redis_single_node_no_pass(self):
         config.redis_host = "localhost"
@@ -31,13 +37,19 @@ class RedisSingleNodeClientTestCase(TestCase):
         config.redis_mode = "single_node"
 
         client = redis_client()
+
         expect(client).not_to_be_null()
-        expect(str(client)).to_equal(
-            "Redis<ConnectionPool<Connection<host=localhost,port=6380,db=0>>>"
-        )
+        expect(client).to_be_instance_of(Redis)
+        kwargs = client.connection_pool.connection_kwargs
+        expect(kwargs["host"]).to_equal("localhost")
+        expect(kwargs["port"]).to_equal(6380)
+        expect(kwargs["db"]).to_equal(0)
 
 
 class RedisSentinelClientTestCase(TestCase):
+    def setUp(self):
+        context.metrics = mock.Mock()
+
     def test_should_connect_to_redis_sentinel(self):
         config.redis_mode = "sentinel"
         config.redis_sentinel_instances = "localhost:26380"
@@ -48,9 +60,11 @@ class RedisSentinelClientTestCase(TestCase):
         config.redis_sentinel_socket_timeout = 10.0
 
         client = redis_client()
+
         expect(client).not_to_be_null()
-        expect(str(client)).to_equal(
-            "Redis<SentinelConnectionPool<service=redismaster(master)>"
+        expect(client).to_be_instance_of(Redis)
+        expect(client.connection_pool).to_be_instance_of(
+            SentinelConnectionPool
         )
 
     def test_should_connect_to_redis_sentinel_no_pass(self):
@@ -63,9 +77,11 @@ class RedisSentinelClientTestCase(TestCase):
         config.redis_sentinel_socket_timeout = 10.0
 
         client = redis_client()
+
         expect(client).not_to_be_null()
-        expect(str(client)).to_equal(
-            "Redis<SentinelConnectionPool<service=redismaster(master)>"
+        expect(client).to_be_instance_of(Redis)
+        expect(client.connection_pool).to_be_instance_of(
+            SentinelConnectionPool
         )
 
 

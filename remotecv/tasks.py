@@ -2,8 +2,6 @@ from remotecv.image_processor import ImageProcessor
 from remotecv.timing import get_interval, get_time
 from remotecv.utils import config, context, logger
 
-# pylint: disable=no-member
-
 
 class DetectTask:
     queue = "Detect"
@@ -19,7 +17,7 @@ class DetectTask:
         result_store.store(key, points)
 
         context.metrics.timing(
-            "worker.pyres_task.time",
+            "worker.task.time",
             get_interval(start_time, get_time()),
         )
-        context.metrics.incr("worker.pyres_task.total")
+        context.metrics.incr("worker.task.total")

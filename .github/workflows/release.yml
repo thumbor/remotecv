@@ -115,7 +115,7 @@ jobs:
             type=sha
 
       - name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v7
         with:
           context: ./docker
           platforms: linux/amd64,linux/arm64

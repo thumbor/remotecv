@@ -21,24 +21,24 @@ jobs:
           - "3.13"
           - "3.14"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: APT Update
         run: sudo apt-get update -y
       - name: APT Install
         run: sudo apt-get install -y --no-install-recommends libjpeg-dev
-      - uses: actions/cache@v5
+      - uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: ${{ env.pythonLocation }}
           key: ubuntu-22.04-${{ env.pythonLocation }}-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}
       - name: Install remotecv
         run: pip install --upgrade --upgrade-strategy eager -e .[dev]
       - run: docker compose pull
-      - uses: satackey/action-docker-layer-caching@v0.0.11
+      - uses: satackey/action-docker-layer-caching@46d2c640b1d8ef50d185452ad6fb324e6bd1d052 # v0.0.11
         continue-on-error: true
       - name: Start Redis
         run: make run-redis
@@ -47,7 +47,7 @@ jobs:
       - name: Generate lcov
         run: make coverage
       - name: Coveralls
-        uses: coverallsapp/github-action@v2.3.6
+        uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: coverage.lcov
@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls Finished
-        uses: coverallsapp/github-action@v2.3.6
+        uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true

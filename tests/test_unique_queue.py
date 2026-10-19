@@ -294,3 +294,20 @@ class UniqueWorkerTestCase(TestCase):
         for line in logs.output:
             expect(line).Not.to_include("s3cret")
             expect(line).Not.to_include("sig")
+
+    def test_should_flush_sentry_after_a_failed_job(self):
+        calls = []
+        job = mock.Mock(
+            _queue="Detect",
+            _payload={"key": "key", "class": "Task", "args": []},
+        )
+        job.perform.side_effect = RuntimeError("boom")
+        job.fail.side_effect = lambda _: calls.append("fail")
+
+        with mock.patch(
+            "remotecv.unique_queue.sentry_sdk.flush",
+            side_effect=lambda: calls.append("flush"),
+        ), self.assertLogs("pyres.worker", level="ERROR"):
+            self.unique_queue.process(job)
+
+        expect(calls).to_equal(["fail", "flush"])

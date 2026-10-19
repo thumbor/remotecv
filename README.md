@@ -128,6 +128,10 @@ are the options you are most likely to use:
 | Max image pixels                | `--max-image-pixels`      | `MAX_IMAGE_PIXELS`      | `89478485` (Pillow default, 0 disables) |
 | Memcached hosts                 | `--memcached-hosts`       | `MEMCACHED_HOSTS`       | `localhost:11211`                       |
 
+Sentry events are tagged with the release `remotecv@<version>` unless the SDK
+detects one on its own, for example from `SENTRY_RELEASE`, the git revision or
+a platform variable such as `HEROKU_SLUG_COMMIT`.
+
 ### Secrets
 
 Every option that carries a secret also has an environment variable, and

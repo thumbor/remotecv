@@ -19,6 +19,7 @@ from click_option_group import optgroup
 
 from remotecv.error_handler import ErrorHandler
 from remotecv.healthcheck import HealthCheckHandler
+from remotecv.image import DEFAULT_MAX_IMAGE_PIXELS
 from remotecv.importer import Importer
 from remotecv.utils import SENTINEL, SINGLE_NODE, config, context, redis_client
 
@@ -305,6 +306,14 @@ def import_modules():
     default=False,
     help="Clears metadata when loading image",
 )
+@optgroup.option(
+    "--max-image-pixels",
+    envvar="MAX_IMAGE_PIXELS",
+    show_envvar=True,
+    default=DEFAULT_MAX_IMAGE_PIXELS,
+    type=click.IntRange(min=0),
+    help="Skip images with more pixels than this (0 for no limit)",
+)
 @optgroup.group("Memcached store arguments")
 @optgroup.option(
     "--memcached-hosts",
@@ -344,6 +353,7 @@ def main(**params):
     config.worker_ttl = params["worker_ttl"]
     config.prune_dead_members = params["prune_dead_members"]
     config.clear_image_metadata = params["clear_image_metadata"]
+    config.max_image_pixels = params["max_image_pixels"]
     config.server_port = params["server_port"]
     config.log_level = params["level"].upper()
     config.loader = import_module(params["loader"])

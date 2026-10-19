@@ -19,9 +19,11 @@ class RedisSingleNodeClientTestCase(TestCase):
         client = redis_client()
 
         expect(client).not_to_be_null()
-        expect(str(client)).to_equal(
-            "Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>"
-        )
+        connection_kwargs = client.connection_pool.connection_kwargs
+        expect(connection_kwargs["host"]).to_equal("localhost")
+        expect(connection_kwargs["port"]).to_equal(6379)
+        expect(connection_kwargs["db"]).to_equal(0)
+        expect(connection_kwargs["password"]).to_equal("superpassword")
 
     def test_should_connect_to_redis_single_node_no_pass(self):
         config.redis_host = "localhost"
@@ -32,9 +34,11 @@ class RedisSingleNodeClientTestCase(TestCase):
 
         client = redis_client()
         expect(client).not_to_be_null()
-        expect(str(client)).to_equal(
-            "Redis<ConnectionPool<Connection<host=localhost,port=6380,db=0>>>"
-        )
+        connection_kwargs = client.connection_pool.connection_kwargs
+        expect(connection_kwargs["host"]).to_equal("localhost")
+        expect(connection_kwargs["port"]).to_equal(6380)
+        expect(connection_kwargs["db"]).to_equal(0)
+        expect(connection_kwargs["password"]).to_be_null()
 
 
 class RedisSentinelClientTestCase(TestCase):
@@ -49,9 +53,11 @@ class RedisSentinelClientTestCase(TestCase):
 
         client = redis_client()
         expect(client).not_to_be_null()
-        expect(str(client)).to_equal(
-            "Redis<SentinelConnectionPool<service=redismaster(master)>"
-        )
+        connection_pool = client.connection_pool
+        expect(connection_pool.service_name).to_equal("redismaster")
+        expect(connection_pool.is_master).to_be_true()
+        expect(connection_pool.connection_kwargs["db"]).to_equal(0)
+        expect(connection_pool.connection_kwargs["password"]).to_be_null()
 
     def test_should_connect_to_redis_sentinel_no_pass(self):
         config.redis_mode = "sentinel"
@@ -64,9 +70,11 @@ class RedisSentinelClientTestCase(TestCase):
 
         client = redis_client()
         expect(client).not_to_be_null()
-        expect(str(client)).to_equal(
-            "Redis<SentinelConnectionPool<service=redismaster(master)>"
-        )
+        connection_pool = client.connection_pool
+        expect(connection_pool.service_name).to_equal("redismaster")
+        expect(connection_pool.is_master).to_be_true()
+        expect(connection_pool.connection_kwargs["db"]).to_equal(0)
+        expect(connection_pool.connection_kwargs["password"]).to_be_null()
 
 
 class RedisNoneClientTestCase(TestCase):

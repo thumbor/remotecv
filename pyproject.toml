@@ -33,7 +33,7 @@ dependencies = [
   "click-option-group>=0.5.6,<0.6.0",
   "click>=8.1.7,<9",
   "opencv-python-headless>=4.9.0.80,<5",
-  "Pillow>=10.4.0,<13",
+  "Pillow>=10.4.0,<14",
   "pyres>=1.5,<2",
   "redis==7.4.0",
   "sentry-sdk>=1.39.1,<3",

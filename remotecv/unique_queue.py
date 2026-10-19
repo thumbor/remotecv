@@ -1,8 +1,20 @@
 from pyres import ResQ
+from pyres.job import Job
 from pyres.worker import Worker
 
 from remotecv.timing import get_interval, get_time
-from remotecv.utils import config, context, logger
+from remotecv.utils import config, context, logger, redact_url
+
+
+def redact_args(args):
+    if isinstance(args, str):
+        return redact_url(args)
+    if isinstance(args, (list, tuple)):
+        return [redact_args(arg) for arg in args]
+    if isinstance(args, dict):
+        return {key: redact_args(value) for key, value in args.items()}
+    return args
+
 
 ALLOWED_JOB_CLASSES = frozenset({"remotecv.pyres_tasks.DetectTask"})
 
@@ -36,7 +48,7 @@ class UniqueQueue(ResQ):
         self, klass_as_string, queue, args=None, key=None
     ):
         if not self.add_unique_key(queue, key):
-            logger.debug("key %s already enqueued", key)
+            logger.debug("key %s already enqueued", redact_url(str(key)))
             return
 
         if not args:
@@ -51,12 +63,21 @@ class UniqueQueue(ResQ):
         self.push(queue, payload)
         logger.info("enqueued '%s' job on queue %s", klass_as_string, queue)
         if args:
-            logger.debug("job arguments: %s", str(args))
+            logger.debug("job arguments: %s", redact_args(args))
         else:
             logger.debug("no arguments passed in.")
 
 
+class RedactedJob(Job):
+    # pyres logs str(job) at INFO on every job and at ERROR on failure.
+    def __str__(self):
+        args = redact_args(self._payload["args"])
+        return f"(Job{{{self._queue}}} | {self._payload['class']} | {args!r})"
+
+
 class UniqueWorker(Worker):
+    job_class = RedactedJob
+
     def __init__(
         self,
         queues=(),

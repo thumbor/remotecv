@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from unittest import TestCase, mock
+from urllib.parse import quote
 
 from preggy import expect
 from pyres.job import Job
 
+from remotecv import http_loader
 from remotecv.unique_queue import UniqueQueue, UniqueWorker
 from remotecv.utils import config, context, redis_client
 
@@ -84,6 +86,23 @@ class UniqueQueueTestCase(TestCase):
         expect(value).not_to_be_null()
         expect(queue_value).to_equal(1)
         expect(queues_value).to_equal({b"foo"})
+
+    def test_should_not_log_credentials_when_enqueuing(self):
+        image_url = quote("http://user:s3cret@images.example.com/a.jpg?sig=x")
+
+        with self.assertLogs("remotecv", level="DEBUG") as logs:
+            for _ in range(2):
+                self.unique_queue.enqueue_unique_from_string(
+                    "remotecv.pyres_tasks.DetectTask",
+                    "Detect",
+                    args=["all", image_url],
+                    key=image_url,
+                )
+
+        expect(logs.output).to_length(3)
+        for line in logs.output:
+            expect(line).Not.to_include("s3cret")
+            expect(line).Not.to_include("sig")
 
     def test_should_send_metrics(self):
         context.metrics = mock.Mock()
@@ -182,3 +201,96 @@ class UniqueWorkerTestCase(TestCase):
 
         perform.assert_not_called()
         expect(self.redis.llen("resque:failed")).to_equal(failed_before + 1)
+
+    def test_should_not_log_credentials_in_job_args(self):
+        context.metrics = mock.Mock()
+        self.redis.delete("resque:queue:Detect")
+        image_url = quote("http://user:s3cret@images.example.com/a.jpg?sig=x")
+        UniqueQueue(server=self.redis).enqueue_unique_from_string(
+            "remotecv.pyres_tasks.DetectTask",
+            "Detect",
+            args=["all", image_url],
+            key=image_url,
+        )
+
+        with self.assertLogs("pyres.worker", level="INFO") as logs:
+            job = self.unique_queue.reserve(timeout=1)
+
+        expect(str(job)).to_include("http://images.example.com/a.jpg")
+        for text in [str(job), *logs.output]:
+            expect(text).Not.to_include("s3cret")
+            expect(text).Not.to_include("sig")
+
+    def test_should_reserve_job_with_invalid_url(self):
+        context.metrics = mock.Mock()
+        self.redis.delete("resque:queue:Detect")
+        image_url = quote("http://user:s3cret@[::1/a.jpg?sig=x")
+        UniqueQueue(server=self.redis).enqueue_unique_from_string(
+            "remotecv.pyres_tasks.DetectTask",
+            "Detect",
+            args=["all", image_url],
+            key=image_url,
+        )
+
+        job = self.unique_queue.reserve(timeout=1)
+
+        expect(str(job)).to_include("<invalid url>")
+        expect(str(job)).Not.to_include("s3cret")
+
+    def test_should_reserve_job_with_unexpected_args(self):
+        context.metrics = mock.Mock()
+        queue = UniqueQueue(server=self.redis)
+        for args in (None, 5):
+            self.redis.delete("resque:queue:Detect")
+            queue.push(
+                "Detect",
+                {
+                    "class": "remotecv.pyres_tasks.DetectTask",
+                    "args": args,
+                    "key": "k",
+                },
+            )
+
+            job = self.unique_queue.reserve(timeout=1)
+
+            expect(str(job)).to_include(str(args))
+
+    def test_should_not_log_credentials_in_nested_job_args(self):
+        context.metrics = mock.Mock()
+        self.redis.delete("resque:queue:Detect")
+        image_url = "http://user:s3cret@images.example.com/a.jpg?sig=x"
+        UniqueQueue(server=self.redis).push(
+            "Detect",
+            {
+                "class": "remotecv.pyres_tasks.DetectTask",
+                "args": {"url": image_url, "all": [image_url]},
+                "key": "k",
+            },
+        )
+
+        job = self.unique_queue.reserve(timeout=1)
+
+        expect(str(job)).to_include("http://images.example.com/a.jpg")
+        expect(str(job)).Not.to_include("s3cret")
+        expect(str(job)).Not.to_include("sig")
+
+    def test_should_not_log_credentials_when_job_fails(self):
+        context.metrics = mock.Mock()
+        config.loader = http_loader
+        self.redis.delete("resque:queue:Detect")
+        image_url = quote("http://user:s3cret@images.example.com/b.jpg?sig=x")
+        UniqueQueue(server=self.redis).enqueue_unique_from_string(
+            "remotecv.pyres_tasks.DetectTask",
+            "Detect",
+            args=["all", image_url],
+            key=image_url,
+        )
+        job = self.unique_queue.reserve(timeout=1)
+
+        with self.assertLogs("pyres.worker", level="ERROR") as logs:
+            self.unique_queue.process(job)
+
+        expect(logs.output[0]).to_include("invalid image URL")
+        for line in logs.output:
+            expect(line).Not.to_include("s3cret")
+            expect(line).Not.to_include("sig")

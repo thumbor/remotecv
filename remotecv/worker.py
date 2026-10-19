@@ -11,7 +11,6 @@
 import logging
 import math
 import sys
-from http.server import HTTPServer
 from importlib import import_module
 from threading import Thread
 
@@ -19,7 +18,7 @@ import click
 from click_option_group import optgroup
 
 from remotecv.error_handler import ErrorHandler
-from remotecv.healthcheck import HealthCheckHandler
+from remotecv.healthcheck import HealthCheckHandler, HealthCheckServer
 from remotecv.image import DEFAULT_MAX_IMAGE_PIXELS
 from remotecv.importer import Importer
 from remotecv.utils import SENTINEL, SINGLE_NODE, config, context, redis_client
@@ -64,11 +63,14 @@ def start_http_server():
         with httpd:
             httpd.serve_forever()
 
-    httpd = HTTPServer(("", config.server_port), HealthCheckHandler)
+    httpd = HealthCheckServer(
+        (config.server_host, config.server_port), HealthCheckHandler
+    )
 
     thread = Thread(target=serve_forever, args=(httpd,))
     thread.daemon = True
     thread.start()
+    return httpd
 
 
 def finite_only(_ctx, _param, value):
@@ -218,6 +220,13 @@ def import_modules():
     help="SQS command",
 )
 @optgroup.group("Other arguments")
+@optgroup.option(
+    "--server-host",
+    envvar="HTTP_SERVER_HOST",
+    show_envvar=True,
+    default="0.0.0.0",
+    help="HTTP server bind address",
+)
 @optgroup.option(
     "--server-port",
     envvar="HTTP_SERVER_PORT",
@@ -378,6 +387,7 @@ def main(**params):
     config.prune_dead_members = params["prune_dead_members"]
     config.clear_image_metadata = params["clear_image_metadata"]
     config.max_image_pixels = params["max_image_pixels"]
+    config.server_host = params["server_host"]
     config.server_port = params["server_port"]
     config.log_level = params["level"].upper()
     config.loader = import_module(params["loader"])

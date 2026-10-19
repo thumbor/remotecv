@@ -9,6 +9,7 @@
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
 import logging
+import math
 import sys
 from http.server import HTTPServer
 from importlib import import_module
@@ -68,6 +69,12 @@ def start_http_server():
     thread = Thread(target=serve_forever, args=(httpd,))
     thread.daemon = True
     thread.start()
+
+
+def finite_only(_ctx, _param, value):
+    if not math.isfinite(value):
+        raise click.BadParameter(f"{value} is not a finite number")
+    return value
 
 
 def import_modules():
@@ -252,6 +259,23 @@ def import_modules():
     help="Image loader",
 )
 @optgroup.option(
+    "--loader-timeout",
+    envvar="IMAGE_LOADER_TIMEOUT",
+    show_envvar=True,
+    default=20.0,
+    type=click.FloatRange(min=0, min_open=True),
+    callback=finite_only,
+    help="Timeout in seconds for fetching the original image",
+)
+@optgroup.option(
+    "--loader-max-body-size",
+    envvar="IMAGE_LOADER_MAX_BODY_SIZE",
+    show_envvar=True,
+    default=0,
+    type=click.IntRange(min=0),
+    help="Maximum size in bytes of the original image (0 for no limit)",
+)
+@optgroup.option(
     "-s",
     "--store",
     envvar="DETECTOR_STORAGE",
@@ -357,6 +381,8 @@ def main(**params):
     config.server_port = params["server_port"]
     config.log_level = params["level"].upper()
     config.loader = import_module(params["loader"])
+    config.loader_timeout = params["loader_timeout"]
+    config.loader_max_body_size = params["loader_max_body_size"]
     config.store = import_module(params["store"])
 
     config.metrics = params["metrics"]

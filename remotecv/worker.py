@@ -294,7 +294,7 @@ def import_modules():
     envvar="DETECTOR_TIMEOUT",
     show_envvar=True,
     default=None,
-    type=click.INT,
+    type=click.IntRange(min=0),
     help="Timeout in seconds for image detection",
 )
 @optgroup.option(

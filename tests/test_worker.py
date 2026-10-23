@@ -35,6 +35,17 @@ class UniqueQueueTestCase(TestCase):
         celery_mock.assert_called_once()
         http_mock.assert_not_called()
 
+    def test_should_refuse_negative_timeout(
+        self, http_mock, celery_mock, pyres_mock
+    ):
+        result = self.runner.invoke(
+            worker.main, ["-b", "celery", "--timeout", "-1"]
+        )
+        expect(result.exit_code).to_equal(2)
+        celery_mock.assert_not_called()
+        pyres_mock.assert_not_called()
+        http_mock.assert_not_called()
+
     def test_should_start_healthcheck(
         self, http_mock, celery_mock, pyres_mock
     ):

@@ -9,8 +9,8 @@
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
 import logging
+import math
 import sys
-from http.server import HTTPServer
 from importlib import import_module
 from threading import Thread
 
@@ -18,7 +18,8 @@ import click
 from click_option_group import optgroup
 
 from remotecv.error_handler import ErrorHandler
-from remotecv.healthcheck import HealthCheckHandler
+from remotecv.healthcheck import HealthCheckHandler, HealthCheckServer
+from remotecv.image import DEFAULT_MAX_IMAGE_PIXELS
 from remotecv.importer import Importer
 from remotecv.utils import SENTINEL, SINGLE_NODE, config, context, redis_client
 
@@ -30,14 +31,10 @@ def start_pyres_worker():
 
     redis = redis_client()
 
-    def after_fork(_):
-        config.error_handler.install_handler()
-
     worker = UniqueWorker(
         queues=["Detect"],
         server=redis,
         timeout=config.timeout,
-        after_fork=after_fork,
     )
     worker.work()
 
@@ -62,11 +59,20 @@ def start_http_server():
         with httpd:
             httpd.serve_forever()
 
-    httpd = HTTPServer(("", config.server_port), HealthCheckHandler)
+    httpd = HealthCheckServer(
+        (config.server_host, config.server_port), HealthCheckHandler
+    )
 
     thread = Thread(target=serve_forever, args=(httpd,))
     thread.daemon = True
     thread.start()
+    return httpd
+
+
+def finite_only(_ctx, _param, value):
+    if not math.isfinite(value):
+        raise click.BadParameter(f"{value} is not a finite number")
+    return value
 
 
 def import_modules():
@@ -211,6 +217,13 @@ def import_modules():
 )
 @optgroup.group("Other arguments")
 @optgroup.option(
+    "--server-host",
+    envvar="HTTP_SERVER_HOST",
+    show_envvar=True,
+    default="0.0.0.0",
+    help="HTTP server bind address",
+)
+@optgroup.option(
     "--server-port",
     envvar="HTTP_SERVER_PORT",
     show_envvar=True,
@@ -249,6 +262,23 @@ def import_modules():
     show_envvar=True,
     default="remotecv.http_loader",
     help="Image loader",
+)
+@optgroup.option(
+    "--loader-timeout",
+    envvar="IMAGE_LOADER_TIMEOUT",
+    show_envvar=True,
+    default=20.0,
+    type=click.FloatRange(min=0, min_open=True),
+    callback=finite_only,
+    help="Timeout in seconds for fetching the original image",
+)
+@optgroup.option(
+    "--loader-max-body-size",
+    envvar="IMAGE_LOADER_MAX_BODY_SIZE",
+    show_envvar=True,
+    default=0,
+    type=click.IntRange(min=0),
+    help="Maximum size in bytes of the original image (0 for no limit)",
 )
 @optgroup.option(
     "-s",
@@ -305,6 +335,14 @@ def import_modules():
     default=False,
     help="Clears metadata when loading image",
 )
+@optgroup.option(
+    "--max-image-pixels",
+    envvar="MAX_IMAGE_PIXELS",
+    show_envvar=True,
+    default=DEFAULT_MAX_IMAGE_PIXELS,
+    type=click.IntRange(min=0),
+    help="Skip images with more pixels than this (0 for no limit)",
+)
 @optgroup.group("Memcached store arguments")
 @optgroup.option(
     "--memcached-hosts",
@@ -344,9 +382,13 @@ def main(**params):
     config.worker_ttl = params["worker_ttl"]
     config.prune_dead_members = params["prune_dead_members"]
     config.clear_image_metadata = params["clear_image_metadata"]
+    config.max_image_pixels = params["max_image_pixels"]
+    config.server_host = params["server_host"]
     config.server_port = params["server_port"]
     config.log_level = params["level"].upper()
     config.loader = import_module(params["loader"])
+    config.loader_timeout = params["loader_timeout"]
+    config.loader_max_body_size = params["loader_max_body_size"]
     config.store = import_module(params["store"])
 
     config.metrics = params["metrics"]

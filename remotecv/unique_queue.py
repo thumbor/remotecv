@@ -1,8 +1,23 @@
+import sentry_sdk
 from pyres import ResQ
+from pyres.job import Job
 from pyres.worker import Worker
 
 from remotecv.timing import get_interval, get_time
-from remotecv.utils import config, context, logger
+from remotecv.utils import config, context, logger, redact_url
+
+
+def redact_args(args):
+    if isinstance(args, str):
+        return redact_url(args)
+    if isinstance(args, (list, tuple)):
+        return [redact_args(arg) for arg in args]
+    if isinstance(args, dict):
+        return {key: redact_args(value) for key, value in args.items()}
+    return args
+
+
+ALLOWED_JOB_CLASSES = frozenset({"remotecv.pyres_tasks.DetectTask"})
 
 
 class UniqueQueue(ResQ):
@@ -34,7 +49,7 @@ class UniqueQueue(ResQ):
         self, klass_as_string, queue, args=None, key=None
     ):
         if not self.add_unique_key(queue, key):
-            logger.debug("key %s already enqueued", key)
+            logger.debug("key %s already enqueued", redact_url(str(key)))
             return
 
         if not args:
@@ -49,12 +64,21 @@ class UniqueQueue(ResQ):
         self.push(queue, payload)
         logger.info("enqueued '%s' job on queue %s", klass_as_string, queue)
         if args:
-            logger.debug("job arguments: %s", str(args))
+            logger.debug("job arguments: %s", redact_args(args))
         else:
             logger.debug("no arguments passed in.")
 
 
+class RedactedJob(Job):
+    # pyres logs str(job) at INFO on every job and at ERROR on failure.
+    def __str__(self):
+        args = redact_args(self._payload["args"])
+        return f"(Job{{{self._queue}}} | {self._payload['class']} | {args!r})"
+
+
 class UniqueWorker(Worker):
+    job_class = RedactedJob
+
     def __init__(
         self,
         queues=(),
@@ -70,10 +94,24 @@ class UniqueWorker(Worker):
         if self.after_fork_fn and callable(self.after_fork_fn):
             self.after_fork_fn(job)
 
+    def process(self, job=None):
+        # pyres runs this in a forked child that ends with os._exit, which
+        # skips the Sentry SDK's atexit flush, so a failure logged by pyres
+        # here never leaves the process unless it is sent before returning.
+        try:
+            return super().process(job)
+        finally:
+            sentry_sdk.flush()
+
     def before_process(self, job):
+        payload = job._payload  # pylint: disable=protected-access
         self.resq.del_unique_key(
-            job._queue, job._payload["key"]  # pylint: disable=protected-access
+            job._queue, payload["key"]  # pylint: disable=protected-access
         )
+        if payload["class"] not in ALLOWED_JOB_CLASSES:
+            raise ValueError(
+                f"refusing job with unexpected class {payload['class']!r}"
+            )
         return job
 
     def reserve(self, timeout=10):

@@ -1,6 +1,6 @@
 from remotecv.image_processor import ImageProcessor
 from remotecv.timing import get_interval, get_time
-from remotecv.utils import config, context, logger
+from remotecv.utils import config, context, logger, redact_url
 
 # pylint: disable=no-member
 
@@ -12,7 +12,9 @@ class DetectTask:
     @classmethod
     def perform(cls, detection_type, image_path, key):
         start_time = get_time()
-        logger.info("Detecting %s for %s", detection_type, image_path)
+        logger.info(
+            "Detecting %s for %s", detection_type, redact_url(image_path)
+        )
         image_data = config.loader.load_sync(image_path)
         points = cls.processor.detect(detection_type, image_data)
         result_store = config.store.ResultStore(config)

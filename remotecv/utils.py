@@ -9,6 +9,8 @@
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
 import logging
+import re
+from urllib.parse import unquote, urlsplit, urlunsplit
 
 from redis import Redis, Sentinel
 
@@ -29,6 +31,36 @@ context = Context()
 
 SINGLE_NODE = "single_node"
 SENTINEL = "sentinel"
+
+SCHEME = re.compile(r"^([a-zA-Z][a-zA-Z0-9+.-]*):/{1,2}")
+
+
+def redact_url(url):
+    # thumbor enqueues the image URL percent-encoded and usually without a
+    # scheme, so normalize it the way http_loader.load_sync does first.
+    # A single slash after the scheme would leave the userinfo in the path.
+    url, schemes = SCHEME.subn(r"\1://", unquote(url))
+    has_authority = bool(schemes) or url.startswith("//")
+    try:
+        parts = urlsplit(url if has_authority else f"//{url}")
+    except ValueError:
+        # pyres formats str(job) outside any handler when it reserves a job.
+        return "<invalid url>"
+
+    netloc = parts.hostname or ""
+    if ":" in netloc:
+        netloc = f"[{netloc}]"
+    try:
+        if parts.port:
+            netloc = f"{netloc}:{parts.port}"
+    except ValueError:
+        # An encoded '/' in a password unquotes into the path, and urllib
+        # rejects the non-numeric port that results, so the URL is invalid.
+        if "@" in parts.path:
+            return "<invalid url>"
+
+    redacted = urlunsplit((parts.scheme, netloc, parts.path, "", ""))
+    return redacted if has_authority else redacted.removeprefix("//")
 
 
 def redis_client():

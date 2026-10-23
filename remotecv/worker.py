@@ -19,6 +19,7 @@ from click_option_group import optgroup
 
 from remotecv.error_handler import ErrorHandler
 from remotecv.healthcheck import HealthCheckHandler, HealthCheckServer
+from remotecv.http_loader import DEFAULT_USER_AGENT
 from remotecv.image import DEFAULT_MAX_IMAGE_PIXELS
 from remotecv.importer import Importer
 from remotecv.utils import SENTINEL, SINGLE_NODE, config, context, redis_client
@@ -72,6 +73,14 @@ def start_http_server():
 def finite_only(_ctx, _param, value):
     if not math.isfinite(value):
         raise click.BadParameter(f"{value} is not a finite number")
+    return value
+
+
+def non_empty_printable_ascii(_ctx, _param, value):
+    if not (value and value.isascii() and value.isprintable()):
+        raise click.BadParameter(
+            f"{value!r} must be non-empty printable ASCII"
+        )
     return value
 
 
@@ -281,6 +290,14 @@ def import_modules():
     help="Maximum size in bytes of the original image (0 for no limit)",
 )
 @optgroup.option(
+    "--loader-user-agent",
+    envvar="IMAGE_LOADER_USER_AGENT",
+    show_envvar=True,
+    default=DEFAULT_USER_AGENT,
+    callback=non_empty_printable_ascii,
+    help="User-Agent header sent when fetching the original image",
+)
+@optgroup.option(
     "-s",
     "--store",
     envvar="DETECTOR_STORAGE",
@@ -389,6 +406,7 @@ def main(**params):
     config.loader = import_module(params["loader"])
     config.loader_timeout = params["loader_timeout"]
     config.loader_max_body_size = params["loader_max_body_size"]
+    config.loader_user_agent = params["loader_user_agent"]
     config.store = import_module(params["store"])
 
     config.metrics = params["metrics"]

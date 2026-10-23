@@ -117,6 +117,7 @@ are the options you are most likely to use:
 | Image loader                    | `--loader`                | `IMAGE_LOADER`          | `remotecv.http_loader`                  |
 | Image fetch timeout (seconds)   | `--loader-timeout`        | `IMAGE_LOADER_TIMEOUT`  | `20.0`                                  |
 | Image max size (bytes)          | `--loader-max-body-size`  | `IMAGE_LOADER_MAX_BODY_SIZE` | `0` (no limit)                     |
+| Image fetch User-Agent          | `--loader-user-agent`     | `IMAGE_LOADER_USER_AGENT` | `remotecv/<version>`                  |
 | Metrics backend                 | `--metrics`               | `METRICS_CLIENT`        | `remotecv.metrics.logger_metrics`       |
 | Log level                       | `--level`                 | `LOG_LEVEL`             | `debug`                                 |
 | Log format                      | `--format`                | `LOG_FORMAT`            | Python logging default for this project |

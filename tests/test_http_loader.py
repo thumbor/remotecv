@@ -6,7 +6,12 @@ from urllib.error import URLError
 
 from preggy import expect
 
-from remotecv.http_loader import BodyTooLargeError, load_sync
+from remotecv import __version__
+from remotecv.http_loader import (
+    DEFAULT_USER_AGENT,
+    BodyTooLargeError,
+    load_sync,
+)
 from remotecv.utils import config, context
 
 SMALL_BODY = b"image-bytes"
@@ -29,6 +34,8 @@ class FixtureHandler(BaseHTTPRequestHandler):
             self.redirect(f"http://127.0.0.1:{self.server.server_port}/small")
         elif self.path == "/redirect-ftp":
             self.redirect("ftp://127.0.0.1/small")
+        elif self.path == "/user-agent":
+            self.respond(self.headers["User-Agent"].encode())
         elif self.path == "/slow":
             time.sleep(2)
         else:
@@ -67,6 +74,7 @@ class HttpLoaderTestCase(TestCase):
         context.metrics = mock.Mock()
         config.loader_timeout = 5.0
         config.loader_max_body_size = 0
+        config.loader_user_agent = DEFAULT_USER_AGENT
 
     def test_should_load_image(self):
         expect(load_sync(f"{self.base_url}/small")).to_equal(SMALL_BODY)
@@ -116,6 +124,17 @@ class HttpLoaderTestCase(TestCase):
         config.loader_timeout = 0.2
         with expect.error_to_happen((URLError, TimeoutError)):
             load_sync(f"{self.base_url}/slow")
+
+    def test_should_send_default_user_agent(self):
+        expect(load_sync(f"{self.base_url}/user-agent")).to_equal(
+            f"remotecv/{__version__}".encode()
+        )
+
+    def test_should_send_configured_user_agent(self):
+        config.loader_user_agent = "Thumbor/7.8.0"
+        expect(load_sync(f"{self.base_url}/user-agent")).to_equal(
+            b"Thumbor/7.8.0"
+        )
 
     def test_should_send_metrics(self):
         load_sync(f"{self.base_url}/small")

@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+# thumbor imaging service
+# https://github.com/thumbor/thumbor/wiki
+
+# Licensed under the MIT license:
+# http://www.opensource.org/licenses/mit-license
+# Copyright (c) 2026 Marcelo Jorge Vieira <metal@alucinados.com>
+
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread

@@ -8,7 +8,7 @@ optional healthchecks, and pluggable metrics/result stores.
 
 ## Dev environment setup
 
-- **Prerequisites:** Python 3.9+, Redis, and Docker Compose for the local
+- **Prerequisites:** Python 3.11+, Redis, and Docker Compose for the local
   Redis/Sentinel test stack.
 - Install the project in editable mode with development dependencies:
 

@@ -8,7 +8,7 @@ version = "5.2.0"
 license = { text = "MIT" }
 description = "remotecv is an OpenCV worker for facial and feature recognition"
 readme = "README.md"
-requires-python = ">=3.10,<3.16"
+requires-python = ">=3.11,<3.16"
 authors = [{ name = "Bernardo Heynemann", email = "heynemann@gmail.com" }]
 keywords = ["opencv", "facial-recognition", "feature-recognition", "worker"]
 classifiers = [
@@ -19,7 +19,6 @@ classifiers = [
   "Operating System :: MacOS",
   "Operating System :: POSIX :: Linux",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -83,7 +82,7 @@ include = [
 
 [tool.black]
 line-length = 79
-target-version = ["py310"]
+target-version = ["py311"]
 
 [tool.isort]
 multi_line_output = 3

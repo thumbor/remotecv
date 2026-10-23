@@ -304,10 +304,13 @@ class UniqueWorkerTestCase(TestCase):
         job.perform.side_effect = RuntimeError("boom")
         job.fail.side_effect = lambda _: calls.append("fail")
 
-        with mock.patch(
-            "remotecv.unique_queue.sentry_sdk.flush",
-            side_effect=lambda: calls.append("flush"),
-        ), self.assertLogs("pyres.worker", level="ERROR"):
+        with (
+            mock.patch(
+                "remotecv.unique_queue.sentry_sdk.flush",
+                side_effect=lambda: calls.append("flush"),
+            ),
+            self.assertLogs("pyres.worker", level="ERROR"),
+        ):
             self.unique_queue.process(job)
 
         expect(calls).to_equal(["fail", "flush"])

@@ -1,11 +1,10 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from unittest import TestCase, mock
 
 from preggy import expect
 
-from remotecv.pyres_tasks import DetectTask
+from remotecv.tasks import DetectTask
 from remotecv.utils import config, context
 from tests import read_fixture
 

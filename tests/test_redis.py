@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from unittest import TestCase, mock
@@ -9,6 +8,9 @@ from remotecv.utils import config, context, redis_client
 
 
 class RedisSingleNodeClientTestCase(TestCase):
+    def setUp(self):
+        context.metrics = mock.Mock()
+
     def test_should_connect_to_redis_single_node(self):
         config.redis_host = "localhost"
         config.redis_port = 6379
@@ -33,6 +35,7 @@ class RedisSingleNodeClientTestCase(TestCase):
         config.redis_mode = "single_node"
 
         client = redis_client()
+
         expect(client).not_to_be_null()
         connection_kwargs = client.connection_pool.connection_kwargs
         expect(connection_kwargs["host"]).to_equal("localhost")
@@ -42,6 +45,9 @@ class RedisSingleNodeClientTestCase(TestCase):
 
 
 class RedisSentinelClientTestCase(TestCase):
+    def setUp(self):
+        context.metrics = mock.Mock()
+
     def test_should_connect_to_redis_sentinel(self):
         config.redis_mode = "sentinel"
         config.redis_sentinel_instances = "localhost:26380"
@@ -52,6 +58,7 @@ class RedisSentinelClientTestCase(TestCase):
         config.redis_sentinel_socket_timeout = 10.0
 
         client = redis_client()
+
         expect(client).not_to_be_null()
         connection_pool = client.connection_pool
         expect(connection_pool.service_name).to_equal("redismaster")
@@ -69,6 +76,7 @@ class RedisSentinelClientTestCase(TestCase):
         config.redis_sentinel_socket_timeout = 10.0
 
         client = redis_client()
+
         expect(client).not_to_be_null()
         connection_pool = client.connection_pool
         expect(connection_pool.service_name).to_equal("redismaster")

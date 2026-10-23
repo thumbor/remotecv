@@ -1,7 +1,7 @@
 import struct
 import warnings
 from io import BytesIO
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from PIL import Image as PilImage
 from preggy import expect
@@ -101,3 +101,31 @@ class ImageTest(TestCase):
             warnings.simplefilter("ignore", PilImage.DecompressionBombWarning)
             image = Image.create_from_buffer(png_with_size(side, side))
         expect(image).Not.to_be_null()
+
+    def test_should_handle_ioerror_on_image_load(self):
+        pil_img = mock.MagicMock(spec=PilImage.Image)
+        pil_img.is_animated = False
+        pil_img.width = pil_img.height = 1
+        pil_img.load.side_effect = IOError("truncated")
+
+        with mock.patch("remotecv.image.PilImage.open", return_value=pil_img):
+            img = Image.create_from_buffer(b"data")
+
+        # Should still return the image (IOError on load is non-fatal)
+        expect(img).not_to_be_null()
+
+    def test_should_clear_metadata_without_tag_attributes(self):
+        config.clear_image_metadata = True
+        pil_img = mock.MagicMock(spec=PilImage.Image)
+        # spec=PilImage.Image means hasattr checks use the real class attrs;
+        # delete them on the instance to exercise the False branches
+        del pil_img.tag
+        del pil_img.tag_v2
+        pil_img.is_animated = False
+        pil_img.width = pil_img.height = 1
+        pil_img.load.return_value = None
+
+        with mock.patch("remotecv.image.PilImage.open", return_value=pil_img):
+            img = Image.create_from_buffer(b"data")
+
+        expect(img).not_to_be_null()

@@ -7,6 +7,7 @@ from click.testing import CliRunner
 from preggy import expect
 
 from remotecv import worker
+from remotecv.utils import config
 
 
 @mock.patch("remotecv.worker.start_pyres_worker")
@@ -74,3 +75,20 @@ class UniqueQueueTestCase(TestCase):
         pyres_mock.assert_not_called()
         celery_mock.assert_not_called()
         http_mock.assert_not_called()
+
+    def test_should_bind_healthcheck_to_all_interfaces_by_default(
+        self, *_mocks
+    ):
+        self.runner.invoke(worker.main, ["--with-healthcheck"])
+
+        expect(config.server_host).to_equal("0.0.0.0")
+
+    def test_should_read_healthcheck_host_from_option(self, *_mocks):
+        self.runner.invoke(worker.main, ["--server-host", "2001:db8::1"])
+
+        expect(config.server_host).to_equal("2001:db8::1")
+
+    def test_should_read_healthcheck_host_from_environment(self, *_mocks):
+        self.runner.invoke(worker.main, env={"HTTP_SERVER_HOST": "192.0.2.1"})
+
+        expect(config.server_host).to_equal("192.0.2.1")

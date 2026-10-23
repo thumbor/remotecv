@@ -120,6 +120,7 @@ are the options you are most likely to use:
 | Metrics backend                 | `--metrics`               | `METRICS_CLIENT`        | `remotecv.metrics.logger_metrics`       |
 | Log level                       | `--level`                 | `LOG_LEVEL`             | `debug`                                 |
 | Log format                      | `--format`                | `LOG_FORMAT`            | Python logging default for this project |
+| Healthcheck bind address        | `--server-host`           | `HTTP_SERVER_HOST`      | `0.0.0.0`                               |
 | Healthcheck port                | `--server-port`           | `HTTP_SERVER_PORT`      | `8080`                                  |
 | Enable healthcheck              | `--with-healthcheck`      | `WITH_HEALTHCHECK`      | disabled                                |
 | Sentry DSN                      | `--sentry-url`            | `SENTRY_URL`            | unset                                   |

@@ -4,8 +4,7 @@ from PIL import Image as PilImage
 
 from remotecv.utils import config
 
-PilImage.IGNORE_DECODING_ERRORS = True
-PilImage.MAXBLOCK = 2**25
+DEFAULT_MAX_IMAGE_PIXELS = PilImage.MAX_IMAGE_PIXELS
 
 
 class Image:
@@ -15,14 +14,23 @@ class Image:
         return instance.parse_image(image_buffer)
 
     def parse_image(self, image_buffer):
+        limit = getattr(config, "max_image_pixels", DEFAULT_MAX_IMAGE_PIXELS)
+        # Pillow refuses images above twice its own MAX_IMAGE_PIXELS, so it
+        # has to follow the configured limit for 0 or a higher limit to work.
+        PilImage.MAX_IMAGE_PIXELS = limit or None
         try:
             img = PilImage.open(BytesIO(image_buffer))
             if hasattr(img, "is_animated") and img.is_animated:
                 return None
-        except IOError:
+        except (IOError, PilImage.DecompressionBombError):
+            return None
+        if limit and img.width * img.height > limit:
             return None
         try:
             img.load()
+        except PilImage.DecompressionBombError:
+            # Containers such as ICNS only size their embedded image here.
+            return None
         except IOError:
             pass
 

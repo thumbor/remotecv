@@ -27,3 +27,24 @@ class DetectTaskTestCase(TestCase):
         expect(img[0][1]).to_be_numeric()
         expect(img[0][2]).to_be_numeric()
         expect(img[0][3]).to_be_numeric()
+
+    def test_should_not_log_credentials_or_query(self):
+        config.loader = mock.Mock(
+            load_sync=lambda _: read_fixture("one_face.jpg")
+        )
+        config.store = mock.Mock()
+        config.store.ResultStore = mock.Mock(return_value=mock.Mock())
+        context.metrics = mock.Mock()
+
+        with self.assertLogs("remotecv", level="INFO") as logs:
+            DetectTask.perform(
+                "face",
+                "http://user:s3cret@images.example.com/a.jpg?sig=abc",
+                "test-key",
+            )
+
+        expect(logs.output[0]).to_include(
+            "Detecting face for http://images.example.com/a.jpg"
+        )
+        expect(logs.output[0]).Not.to_include("s3cret")
+        expect(logs.output[0]).Not.to_include("sig=abc")

@@ -1,8 +1,17 @@
 from celery import Celery
+from kombu.utils.url import safequote
 
 from remotecv.pyres_tasks import DetectTask
 from remotecv.timing import get_interval, get_time
 from remotecv.utils import context
+
+
+def broker_url(key_id, key_secret):
+    if not key_id and not key_secret:
+        return "sqs://"
+    if not key_id or not key_secret:
+        raise ValueError("AWS key id and key secret must be set together")
+    return f"sqs://{safequote(key_id)}:{safequote(key_secret)}@"
 
 
 class CeleryTasks:
@@ -14,7 +23,8 @@ class CeleryTasks:
         timeout=None,
         polling_interval=None,
     ):  # pylint: disable=too-many-positional-arguments
-        self.celery = Celery(broker=f"sqs://{key_id}:{key_secret}@")
+        self.timeout = timeout
+        self.celery = Celery(broker=broker_url(key_id, key_secret))
 
         self.celery.conf.update(
             BROKER_TRANSPORT_OPTIONS={
@@ -26,7 +36,9 @@ class CeleryTasks:
         )
 
     def get_detect_task(self):
-        @self.celery.task(ignore_result=True, acks_late=True)
+        @self.celery.task(
+            ignore_result=True, acks_late=True, time_limit=self.timeout
+        )
         def detect_task(detection_type, image_path, key):
             start_time = get_time()
             DetectTask.perform(detection_type, image_path, key)

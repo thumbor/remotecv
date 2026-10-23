@@ -85,14 +85,16 @@ remotecv \
   --master-instance=mymaster
 ```
 
-Run with Celery + SQS:
+Run with Celery + SQS (credentials come from the environment, see
+[Secrets](#secrets)):
 
 ```sh
+export AWS_REGION=us-east-1
+export AWS_ACCESS_KEY_ID=...
+export AWS_SECRET_ACCESS_KEY=...
+
 remotecv \
   --backend=celery \
-  --region=us-east-1 \
-  --key-id="$AWS_ACCESS_KEY_ID" \
-  --key-secret="$AWS_SECRET_ACCESS_KEY" \
   --celery-commands=worker \
   --celery-commands=--loglevel=INFO
 ```
@@ -113,14 +115,43 @@ are the options you are most likely to use:
 | Worker TTL                      | `--worker-ttl`            | `WORKER_TTL`            | unset                                   |
 | Result store backend            | `--store`                 | `DETECTOR_STORAGE`      | `remotecv.result_store.redis_store`     |
 | Image loader                    | `--loader`                | `IMAGE_LOADER`          | `remotecv.http_loader`                  |
+| Image fetch timeout (seconds)   | `--loader-timeout`        | `IMAGE_LOADER_TIMEOUT`  | `20.0`                                  |
+| Image max size (bytes)          | `--loader-max-body-size`  | `IMAGE_LOADER_MAX_BODY_SIZE` | `0` (no limit)                     |
 | Metrics backend                 | `--metrics`               | `METRICS_CLIENT`        | `remotecv.metrics.logger_metrics`       |
 | Log level                       | `--level`                 | `LOG_LEVEL`             | `debug`                                 |
 | Log format                      | `--format`                | `LOG_FORMAT`            | Python logging default for this project |
+| Healthcheck bind address        | `--server-host`           | `HTTP_SERVER_HOST`      | `0.0.0.0`                               |
 | Healthcheck port                | `--server-port`           | `HTTP_SERVER_PORT`      | `8080`                                  |
 | Enable healthcheck              | `--with-healthcheck`      | `WITH_HEALTHCHECK`      | disabled                                |
 | Sentry DSN                      | `--sentry-url`            | `SENTRY_URL`            | unset                                   |
 | Clear image metadata            | `--clear-image-metadata`  | `CLEAR_IMAGE_METADATA`  | disabled                                |
+| Max image pixels                | `--max-image-pixels`      | `MAX_IMAGE_PIXELS`      | `89478485` (Pillow default, 0 disables) |
 | Memcached hosts                 | `--memcached-hosts`       | `MEMCACHED_HOSTS`       | `localhost:11211`                       |
+
+Sentry events are tagged with the release `remotecv@<version>` unless the SDK
+detects one on its own, for example from `SENTRY_RELEASE`, the git revision or
+a platform variable such as `HEROKU_SLUG_COMMIT`.
+
+### Secrets
+
+Every option that carries a secret also has an environment variable, and
+that is the form to use for it:
+
+| Secret                         | Environment variable      | CLI option (avoid)    |
+| ------------------------------ | ------------------------- | --------------------- |
+| Redis password                 | `REDIS_PASSWORD`          | `--password`          |
+| Redis Sentinel password        | `REDIS_SENTINEL_PASSWORD` | `--sentinel-password` |
+| Redis Sentinel master password | `REDIS_MASTER_PASSWORD`   | `--master-password`   |
+| AWS secret access key          | `AWS_SECRET_ACCESS_KEY`   | `--key-secret`        |
+
+A value passed on the command line is visible to every user on the host
+through `ps` and `/proc`, and is often captured verbatim by process
+supervisors and container orchestrators in their own logs. A process's
+environment is only readable by its owner and root. Under an orchestrator,
+inject the variables from its secret store rather than writing the values
+into the manifest, where everyone who can read the manifest sees them.
+Running `--help` with the variables set is safe: `show_envvar` prints the
+variable name, never its value.
 
 ### Built-in detectors
 

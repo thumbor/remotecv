@@ -5,25 +5,29 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
-  - repo: https://github.com/PyCQA/isort
-    rev: 6.0.1
+  - repo: local
     hooks:
       - id: isort
-        args: [--settings-file=./pyproject.toml]
-  - repo: https://github.com/psf/black
-    rev: 25.9.0
-    hooks:
+        name: isort
+        entry: sh scripts/run-uv run --locked isort --settings-file=./pyproject.toml
+        language: system
+        types: [python]
+        require_serial: true
       - id: black
-        args: [--config=./pyproject.toml]
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.3.0
-    hooks:
+        name: black
+        entry: sh scripts/run-uv run --locked black --config=./pyproject.toml
+        language: system
+        types: [python]
+        require_serial: true
       - id: flake8
+        name: flake8
+        entry: sh scripts/run-uv run --locked flake8 --config=./.flake8
         language: system
-        args: [--config=./.flake8]
-  - repo: https://github.com/pycqa/pylint
-    rev: v4.0.2
-    hooks:
+        types: [python]
+        require_serial: true
       - id: pylint
+        name: pylint
+        entry: sh scripts/run-uv run --locked pylint --rcfile=./.pylintrc
         language: system
-        args: [--rcfile=./.pylintrc]
+        types: [python]
+        require_serial: true

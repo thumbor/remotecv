@@ -125,3 +125,75 @@ class HttpLoaderTestCase(TestCase):
         context.metrics.incr.assert_any_call(
             "worker.original_image.status.200"
         )
+
+
+class HttpLoaderMetricsTestCase(TestCase):
+    def setUp(self):
+        context.metrics = mock.Mock()
+
+    @mock.patch("remotecv.http_loader.build_opener")
+    def test_should_not_put_credentials_in_metric_names(
+        self, build_opener_mock
+    ):
+        build_opener_mock.return_value.open.return_value = mock.MagicMock(
+            code=200, read=mock.Mock(return_value=b"image")
+        )
+
+        load_sync("http://user:s3cret@images.example.com:8080/image.jpg")
+
+        names = [
+            call.args[0] for call in context.metrics.incr.call_args_list
+        ] + [call.args[0] for call in context.metrics.timing.call_args_list]
+        expect(names).to_include(
+            "worker.original_image.fetch.200.images_example_com"
+        )
+        for name in names:
+            expect(name).Not.to_include("s3cret")
+            expect(name).Not.to_include("8080")
+
+    @mock.patch("remotecv.http_loader.build_opener")
+    def test_should_not_put_colons_of_ipv6_host_in_metric_names(
+        self, build_opener_mock
+    ):
+        build_opener_mock.return_value.open.return_value = mock.MagicMock(
+            code=200, read=mock.Mock(return_value=b"image")
+        )
+
+        load_sync("http://[::1]:8080/image.jpg")
+
+        context.metrics.incr.assert_any_call(
+            "worker.original_image.fetch.200.__1"
+        )
+
+    def test_should_not_put_credentials_in_invalid_url_error(self):
+        for url, redacted in [
+            (
+                "http://user:s3cret@images.example.com/a.jpg?sig=abc",
+                "http://images.example.com/a.jpg",
+            ),
+            (
+                "http://images.example.com/a%20b.jpg?sig=abc",
+                "http://images.example.com/a b.jpg",
+            ),
+        ]:
+            with self.assertRaises(ValueError) as error:
+                load_sync(url)
+
+            expect(str(error.exception)).to_equal(
+                f"invalid image URL {redacted}"
+            )
+            expect(error.exception.__suppress_context__).to_be_true()
+
+    def test_should_refuse_scheme_less_url_without_echoing_it(self):
+        with self.assertRaises(URLError) as error:
+            load_sync("https-images.example.com/a.jpg?sig=abc")
+
+        expect(str(error.exception)).Not.to_include("sig")
+
+    def test_should_not_leak_password_after_encoded_slash_in_error(self):
+        with self.assertRaises(ValueError) as error:
+            load_sync("http://user:ab%2Fcd@images.example.com/image.jpg")
+
+        expect(str(error.exception)).to_equal(
+            "invalid image URL <invalid url>"
+        )

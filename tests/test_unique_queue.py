@@ -4,6 +4,7 @@
 from unittest import TestCase, mock
 
 from preggy import expect
+from pyres.job import Job
 
 from remotecv.unique_queue import UniqueQueue, UniqueWorker
 from remotecv.utils import config, context, redis_client
@@ -150,3 +151,34 @@ class UniqueWorkerTestCase(TestCase):
         members = self.redis.smembers("resque:workers")
         expect(len(members)).to_equal(2)
         expect(str(worker).encode() in members).to_be_true()
+
+    def make_job(self, klass):
+        payload = {
+            "class": klass,
+            "queue": "Detect",
+            "args": ["all", "http://example.com/image.jpg", "key"],
+            "key": "key",
+        }
+        return Job("Detect", payload, self.unique_queue.resq)
+
+    def test_should_accept_detect_task_before_process(self):
+        job = self.make_job("remotecv.pyres_tasks.DetectTask")
+        expect(self.unique_queue.before_process(job)).to_equal(job)
+
+    def test_should_refuse_unexpected_class_before_process(self):
+        self.unique_queue.resq.add_unique_key("Detect", "key")
+        job = self.make_job("os.system")
+
+        with self.assertRaisesRegex(ValueError, "os.system"):
+            self.unique_queue.before_process(job)
+
+        expect(self.redis.get("resque:unique:queue:Detect:key")).to_be_null()
+
+    def test_should_fail_job_with_unexpected_class(self):
+        failed_before = self.redis.llen("resque:failed")
+
+        with mock.patch.object(Job, "perform") as perform:
+            self.unique_queue.process(self.make_job("os.system"))
+
+        perform.assert_not_called()
+        expect(self.redis.llen("resque:failed")).to_equal(failed_before + 1)

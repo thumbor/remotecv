@@ -4,6 +4,8 @@ from pyres.worker import Worker
 from remotecv.timing import get_interval, get_time
 from remotecv.utils import config, context, logger
 
+ALLOWED_JOB_CLASSES = frozenset({"remotecv.pyres_tasks.DetectTask"})
+
 
 class UniqueQueue(ResQ):
     def _escape_for_key(self, value):
@@ -71,9 +73,14 @@ class UniqueWorker(Worker):
             self.after_fork_fn(job)
 
     def before_process(self, job):
+        payload = job._payload  # pylint: disable=protected-access
         self.resq.del_unique_key(
-            job._queue, job._payload["key"]  # pylint: disable=protected-access
+            job._queue, payload["key"]  # pylint: disable=protected-access
         )
+        if payload["class"] not in ALLOWED_JOB_CLASSES:
+            raise ValueError(
+                f"refusing job with unexpected class {payload['class']!r}"
+            )
         return job
 
     def reserve(self, timeout=10):

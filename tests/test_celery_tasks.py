@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-# remote cv service
-# https://github.com/thumbor/remotecv
+# thumbor imaging service
+# https://github.com/thumbor/thumbor/wiki
 
 # Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license

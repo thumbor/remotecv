@@ -40,12 +40,19 @@ For local development:
 ```sh
 git clone https://github.com/thumbor/remotecv.git
 cd remotecv
-python -m venv .venv
-. .venv/bin/activate
-pip install -U pip
 make setup
-pre-commit install
+make pre-commit  # only needed once per clone
 ```
+
+`make setup` uses an existing [uv](https://docs.astral.sh/uv/) installation,
+or installs the pinned version into `.uv-venv` when uv is not available, and
+syncs the locked development environment into `.venv`. Run commands in it with
+`uv run --locked <command>`, or through the Makefile targets below. When
+`make setup` installed uv for you, it is not on `PATH`: call it as
+`.uv-venv/bin/uv` in the commands on this page.
+
+Dependencies are locked in `uv.lock`. After changing them in `pyproject.toml`,
+run `uv lock` and commit the updated lockfile.
 
 ## Running RemoteCV
 

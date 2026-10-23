@@ -8,21 +8,28 @@ optional healthchecks, and pluggable metrics/result stores.
 
 ## Dev environment setup
 
-- **Prerequisites:** Python 3.11+, Redis, and Docker Compose for the local
-  Redis/Sentinel test stack.
-- Install the project in editable mode with development dependencies:
+- **Prerequisites:** Python 3.11+, [uv](https://docs.astral.sh/uv/), Redis,
+  and Docker Compose for the local Redis/Sentinel test stack. When uv is not on
+  `PATH`, `make setup` installs the pinned version into `.uv-venv`; call it as
+  `.uv-venv/bin/uv` in the `uv` commands below. The pinned version lives in
+  `.tool-versions`, which the Makefile and the CI workflows both read.
+- Sync the locked development environment into `.venv` (editable install plus
+  the `dev` dependency group):
 
   ```
   make setup
   ```
 
-  Equivalent to: `pip install -Ue .[dev]`
+  Equivalent to: `uv sync --locked`
 
 - Install pre-commit hooks once after setup:
 
   ```
-  pre-commit install
+  make pre-commit
   ```
+
+- Dependencies are locked in `uv.lock`. After changing them in
+  `pyproject.toml`, run `uv lock` and commit the updated lockfile.
 
 ## Running locally
 
@@ -32,18 +39,18 @@ optional healthchecks, and pluggable metrics/result stores.
   make run
   ```
 
-- The package also exposes a CLI entry point:
+- The package also exposes a CLI entry point, run from the checkout with:
 
   ```
-  remotecv
+  uv run --locked remotecv
   ```
 
 - Useful runtime variants:
 
   ```
-  remotecv --with-healthcheck --server-port=8888
-  remotecv --backend=pyres
-  remotecv --backend=celery
+  uv run --locked remotecv --with-healthcheck --server-port=8888
+  uv run --locked remotecv --backend=pyres
+  uv run --locked remotecv --backend=celery
   ```
 
 - Redis/PyRes is the default backend. Celery mode expects AWS/SQS-related
@@ -88,8 +95,9 @@ optional healthchecks, and pluggable metrics/result stores.
   make lint
   ```
 
-- Pre-commit also enforces trailing whitespace, final newlines, YAML validity,
-  `black`, `flake8`, and `pylint`.
+- Pre-commit runs `isort`, `black`, `flake8`, and `pylint` through the locked
+  uv environment, and also checks trailing whitespace, final newlines, and
+  YAML validity.
 
 ## Project structure
 

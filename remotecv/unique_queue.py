@@ -1,3 +1,4 @@
+import sentry_sdk
 from pyres import ResQ
 from pyres.job import Job
 from pyres.worker import Worker
@@ -92,6 +93,15 @@ class UniqueWorker(Worker):
     def after_fork(self, job):
         if self.after_fork_fn and callable(self.after_fork_fn):
             self.after_fork_fn(job)
+
+    def process(self, job=None):
+        # pyres runs this in a forked child that ends with os._exit, which
+        # skips the Sentry SDK's atexit flush, so a failure logged by pyres
+        # here never leaves the process unless it is sent before returning.
+        try:
+            return super().process(job)
+        finally:
+            sentry_sdk.flush()
 
     def before_process(self, job):
         payload = job._payload  # pylint: disable=protected-access

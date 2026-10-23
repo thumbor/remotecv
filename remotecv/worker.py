@@ -31,14 +31,10 @@ def start_pyres_worker():
 
     redis = redis_client()
 
-    def after_fork(_):
-        config.error_handler.install_handler()
-
     worker = UniqueWorker(
         queues=["Detect"],
         server=redis,
         timeout=config.timeout,
-        after_fork=after_fork,
     )
     worker.work()
 

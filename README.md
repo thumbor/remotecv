@@ -120,6 +120,7 @@ are the options you are most likely to use:
 | Enable healthcheck              | `--with-healthcheck`      | `WITH_HEALTHCHECK`      | disabled                                |
 | Sentry DSN                      | `--sentry-url`            | `SENTRY_URL`            | unset                                   |
 | Clear image metadata            | `--clear-image-metadata`  | `CLEAR_IMAGE_METADATA`  | disabled                                |
+| Max image pixels                | `--max-image-pixels`      | `MAX_IMAGE_PIXELS`      | `89478485` (Pillow default, 0 disables) |
 | Memcached hosts                 | `--memcached-hosts`       | `MEMCACHED_HOSTS`       | `localhost:11211`                       |
 
 ### Built-in detectors

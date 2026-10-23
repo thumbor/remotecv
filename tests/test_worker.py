@@ -42,3 +42,12 @@ class UniqueQueueTestCase(TestCase):
         pyres_mock.assert_called_once()
         celery_mock.assert_not_called()
         http_mock.assert_called_once()
+
+    def test_should_refuse_negative_max_image_pixels(
+        self, http_mock, celery_mock, pyres_mock
+    ):
+        result = self.runner.invoke(worker.main, ["--max-image-pixels=-1"])
+        expect(result.exit_code).to_equal(2)
+        pyres_mock.assert_not_called()
+        celery_mock.assert_not_called()
+        http_mock.assert_not_called()

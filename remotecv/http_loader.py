@@ -4,12 +4,14 @@ from urllib.error import URLError
 from urllib.parse import urlparse
 from urllib.request import HTTPRedirectHandler, build_opener, unquote
 
+from remotecv import __version__
 from remotecv.timing import get_interval, get_time
 from remotecv.utils import config, context, redact_url
 
 DEFAULT_TIMEOUT = 20.0
 DEFAULT_MAX_BODY_SIZE = 0
 ALLOWED_SCHEMES = ("http", "https")
+DEFAULT_USER_AGENT = f"remotecv/{__version__}"
 
 
 class BodyTooLargeError(Exception):
@@ -59,7 +61,9 @@ def load_sync(path):
         raise URLError(f"unsupported scheme: {parsed.scheme}")
     host = (parsed.hostname or "").replace(".", "_").replace(":", "_")
 
+    user_agent = getattr(config, "loader_user_agent", DEFAULT_USER_AGENT)
     opener = build_opener(HttpOnlyRedirectHandler)
+    opener.addheaders = [("User-Agent", user_agent)]
     try:
         response = opener.open(
             path, timeout=getattr(config, "loader_timeout", DEFAULT_TIMEOUT)

@@ -19,7 +19,7 @@ The worker supports:
 
 ## Requirements
 
-- Python `>=3.10,<3.15`
+- Python `>=3.10,<3.16`
 - Redis for the default backend and default result store
 - OpenCV runtime dependencies supported by `opencv-python-headless`
 

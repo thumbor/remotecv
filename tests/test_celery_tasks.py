@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+# remote cv service
+# https://github.com/thumbor/remotecv
+
+# Licensed under the MIT license:
+# http://www.opensource.org/licenses/mit-license
+# Copyright (c) 2026 Marcelo Jorge Vieira <metal@alucinados.com>
+
 from unittest import TestCase
 
 from preggy import expect

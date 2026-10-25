@@ -32,7 +32,7 @@ classifiers = [
 dependencies = [
   "click-option-group>=0.5.6,<0.6.0",
   "click>=8.1.7,<9",
-  "opencv-python-headless>=4.9.0.80,<5",
+  "opencv-python-headless>=4.9.0.80,<6",
   "Pillow>=10.4.0,<14",
   "pyres>=1.5,<2",
   "redis==8.1.0",

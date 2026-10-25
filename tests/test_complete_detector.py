@@ -1,18 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase, mock
+from unittest import TestCase
 
 from preggy import expect
 
 from remotecv.detectors.complete_detector import CompleteDetector
-from remotecv.utils import context
 from tests import create_image
 
 
 class CompleteDetectorTestCase(TestCase):
     def test_should_detect_something(self):
-        context.metrics = mock.Mock()
         detection_result = CompleteDetector().detect(
             create_image("profile_face.jpg")
         )

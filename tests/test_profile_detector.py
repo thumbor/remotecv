@@ -1,19 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase, mock
+from unittest import TestCase
 
 from preggy import expect
 
 from remotecv.detectors.profile_detector import ProfileDetector
-from remotecv.utils import context
 from tests import create_image
 
 
 class ProfileDetectorTestCase(TestCase):
-    def setUp(self):
-        context.metrics = mock.Mock()
-
     def test_should_detect_one_face(self):
         detection_result = ProfileDetector().detect(
             create_image("profile_face.jpg")

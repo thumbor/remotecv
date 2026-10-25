@@ -203,7 +203,6 @@ class UniqueWorkerTestCase(TestCase):
         expect(self.redis.llen("resque:failed")).to_equal(failed_before + 1)
 
     def test_should_not_log_credentials_in_job_args(self):
-        context.metrics = mock.Mock()
         self.redis.delete("resque:queue:Detect")
         image_url = quote("http://user:s3cret@images.example.com/a.jpg?sig=x")
         UniqueQueue(server=self.redis).enqueue_unique_from_string(
@@ -222,7 +221,6 @@ class UniqueWorkerTestCase(TestCase):
             expect(text).Not.to_include("sig")
 
     def test_should_reserve_job_with_invalid_url(self):
-        context.metrics = mock.Mock()
         self.redis.delete("resque:queue:Detect")
         image_url = quote("http://user:s3cret@[::1/a.jpg?sig=x")
         UniqueQueue(server=self.redis).enqueue_unique_from_string(
@@ -238,7 +236,6 @@ class UniqueWorkerTestCase(TestCase):
         expect(str(job)).Not.to_include("s3cret")
 
     def test_should_reserve_job_with_unexpected_args(self):
-        context.metrics = mock.Mock()
         queue = UniqueQueue(server=self.redis)
         for args in (None, 5):
             self.redis.delete("resque:queue:Detect")
@@ -256,7 +253,6 @@ class UniqueWorkerTestCase(TestCase):
             expect(str(job)).to_include(str(args))
 
     def test_should_not_log_credentials_in_nested_job_args(self):
-        context.metrics = mock.Mock()
         self.redis.delete("resque:queue:Detect")
         image_url = "http://user:s3cret@images.example.com/a.jpg?sig=x"
         UniqueQueue(server=self.redis).push(
@@ -275,7 +271,6 @@ class UniqueWorkerTestCase(TestCase):
         expect(str(job)).Not.to_include("sig")
 
     def test_should_not_log_credentials_when_job_fails(self):
-        context.metrics = mock.Mock()
         config.loader = http_loader
         self.redis.delete("resque:queue:Detect")
         image_url = quote("http://user:s3cret@images.example.com/b.jpg?sig=x")

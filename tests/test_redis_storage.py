@@ -4,7 +4,6 @@
 
 import uuid
 
-from preggy import expect
 from redis import RedisError
 from thumbor.testing import TestCase
 from tornado.testing import gen_test
@@ -17,8 +16,7 @@ class RedisStorageTestCase(TestCase):
     async def test_should_be_none_when_not_available(self):
         storage = remotecv.storages.redis_storage.Storage(self.context)
         result = await storage.get_detector_data(uuid.uuid4())
-        expect(result).to_be_null()
-        self.assertIsNone(result)
+        assert result is None
 
     @gen_test
     async def test_should_be_points_when_available(self):
@@ -26,7 +24,7 @@ class RedisStorageTestCase(TestCase):
         storage = remotecv.storages.redis_storage.Storage(self.context)
         await storage.redis_client.set(f"thumbor-detector-{key}", '[{"x": 1}]')
         result = await storage.get_detector_data(key)
-        expect(result).to_equal([{"x": 1}])
+        assert result == [{"x": 1}]
 
     @gen_test
     async def test_should_be_error_when_invalid_redis_mode(self):
@@ -49,7 +47,7 @@ class RedisStorageTestCase(TestCase):
         storage = remotecv.storages.redis_storage.Storage(self.context)
         await storage.redis_client.set(f"thumbor-detector-{key}", '[{"x": 1}]')
         result = await storage.get_detector_data(key)
-        expect(result).to_equal([{"x": 1}])
+        assert result == [{"x": 1}]
 
     @gen_test
     async def test_should_be_points_when_available_in_sentinal_without_auth(
@@ -69,4 +67,4 @@ class RedisStorageTestCase(TestCase):
             "thumbor-detector-random_path", '[{"x": 1}]'
         )
         result = await storage.get_detector_data("random_path")
-        expect(result).to_equal([{"x": 1}])
+        assert result == [{"x": 1}]

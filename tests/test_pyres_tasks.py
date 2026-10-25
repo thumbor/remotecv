@@ -1,9 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import numbers
 from unittest import TestCase, mock
-
-from preggy import expect
 
 from remotecv.pyres_tasks import DetectTask
 from remotecv.utils import config
@@ -20,12 +19,12 @@ class DetectTaskTestCase(TestCase):
         call = store_mock.store.call_args[0]
 
         key, img = call
-        expect(key).to_equal("test-key")
-        expect(len(img)).to_be_greater_than(20)
-        expect(img[0][0]).to_be_numeric()
-        expect(img[0][1]).to_be_numeric()
-        expect(img[0][2]).to_be_numeric()
-        expect(img[0][3]).to_be_numeric()
+        assert key == "test-key"
+        assert len(img) > 20
+        assert isinstance(img[0][0], numbers.Number)
+        assert isinstance(img[0][1], numbers.Number)
+        assert isinstance(img[0][2], numbers.Number)
+        assert isinstance(img[0][3], numbers.Number)
 
     def test_should_not_log_credentials_or_query(self):
         config.loader = mock.Mock(
@@ -41,8 +40,9 @@ class DetectTaskTestCase(TestCase):
                 "test-key",
             )
 
-        expect(logs.output[0]).to_include(
+        assert (
             "Detecting face for http://images.example.com/a.jpg"
+            in logs.output[0]
         )
-        expect(logs.output[0]).Not.to_include("s3cret")
-        expect(logs.output[0]).Not.to_include("sig=abc")
+        assert "s3cret" not in logs.output[0]
+        assert "sig=abc" not in logs.output[0]

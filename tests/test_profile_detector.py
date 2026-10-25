@@ -1,9 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import numbers
 from unittest import TestCase
-
-from preggy import expect
 
 from remotecv.detectors.profile_detector import ProfileDetector
 from tests import create_image
@@ -14,14 +13,14 @@ class ProfileDetectorTestCase(TestCase):
         detection_result = ProfileDetector().detect(
             create_image("profile_face.jpg")
         )
-        expect(detection_result).to_length(1)
-        expect(detection_result[0][0]).to_be_numeric()
-        expect(detection_result[0][1]).to_be_numeric()
-        expect(detection_result[0][2]).to_be_numeric()
-        expect(detection_result[0][3]).to_be_numeric()
+        assert len(detection_result) == 1
+        assert isinstance(detection_result[0][0], numbers.Number)
+        assert isinstance(detection_result[0][1], numbers.Number)
+        assert isinstance(detection_result[0][2], numbers.Number)
+        assert isinstance(detection_result[0][3], numbers.Number)
 
     def test_should_not_detect(self):
         detection_result = ProfileDetector().detect(
             create_image("no_face.jpg")
         )
-        expect(detection_result).to_length(0)
+        assert len(detection_result) == 0

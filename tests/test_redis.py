@@ -3,8 +3,6 @@
 
 from unittest import TestCase, mock
 
-from preggy import expect
-
 from remotecv.utils import config, context, redis_client
 
 
@@ -18,12 +16,12 @@ class RedisSingleNodeClientTestCase(TestCase):
 
         client = redis_client()
 
-        expect(client).not_to_be_null()
+        assert client is not None
         connection_kwargs = client.connection_pool.connection_kwargs
-        expect(connection_kwargs["host"]).to_equal("localhost")
-        expect(connection_kwargs["port"]).to_equal(6379)
-        expect(connection_kwargs["db"]).to_equal(0)
-        expect(connection_kwargs["password"]).to_equal("superpassword")
+        assert connection_kwargs["host"] == "localhost"
+        assert connection_kwargs["port"] == 6379
+        assert connection_kwargs["db"] == 0
+        assert connection_kwargs["password"] == "superpassword"
 
     def test_should_connect_to_redis_single_node_no_pass(self):
         config.redis_host = "localhost"
@@ -33,12 +31,12 @@ class RedisSingleNodeClientTestCase(TestCase):
         config.redis_mode = "single_node"
 
         client = redis_client()
-        expect(client).not_to_be_null()
+        assert client is not None
         connection_kwargs = client.connection_pool.connection_kwargs
-        expect(connection_kwargs["host"]).to_equal("localhost")
-        expect(connection_kwargs["port"]).to_equal(6380)
-        expect(connection_kwargs["db"]).to_equal(0)
-        expect(connection_kwargs["password"]).to_be_null()
+        assert connection_kwargs["host"] == "localhost"
+        assert connection_kwargs["port"] == 6380
+        assert connection_kwargs["db"] == 0
+        assert connection_kwargs["password"] is None
 
 
 class RedisSentinelClientTestCase(TestCase):
@@ -52,12 +50,12 @@ class RedisSentinelClientTestCase(TestCase):
         config.redis_sentinel_socket_timeout = 10.0
 
         client = redis_client()
-        expect(client).not_to_be_null()
+        assert client is not None
         connection_pool = client.connection_pool
-        expect(connection_pool.service_name).to_equal("redismaster")
-        expect(connection_pool.is_master).to_be_true()
-        expect(connection_pool.connection_kwargs["db"]).to_equal(0)
-        expect(connection_pool.connection_kwargs["password"]).to_be_null()
+        assert connection_pool.service_name == "redismaster"
+        assert connection_pool.is_master
+        assert connection_pool.connection_kwargs["db"] == 0
+        assert connection_pool.connection_kwargs["password"] is None
 
     def test_should_connect_to_redis_sentinel_no_pass(self):
         config.redis_mode = "sentinel"
@@ -69,12 +67,12 @@ class RedisSentinelClientTestCase(TestCase):
         config.redis_sentinel_socket_timeout = 10.0
 
         client = redis_client()
-        expect(client).not_to_be_null()
+        assert client is not None
         connection_pool = client.connection_pool
-        expect(connection_pool.service_name).to_equal("redismaster")
-        expect(connection_pool.is_master).to_be_true()
-        expect(connection_pool.connection_kwargs["db"]).to_equal(0)
-        expect(connection_pool.connection_kwargs["password"]).to_be_null()
+        assert connection_pool.service_name == "redismaster"
+        assert connection_pool.is_master
+        assert connection_pool.connection_kwargs["db"] == 0
+        assert connection_pool.connection_kwargs["password"] is None
 
 
 class RedisNoneClientTestCase(TestCase):
@@ -84,8 +82,9 @@ class RedisNoneClientTestCase(TestCase):
         with self.assertRaises(AttributeError) as err:
             redis_client()
 
-        expect(str(err.exception)).to_equal(
-            "redis-mode must be either single_node or sentinel"
+        assert (
+            str(err.exception)
+            == "redis-mode must be either single_node or sentinel"
         )
 
 
@@ -99,7 +98,7 @@ class RedisConnectionMetricsTestCase(TestCase):
         context.metrics = mock.Mock()
 
         client = redis_client()
-        expect(client).not_to_be_null()
+        assert client is not None
 
         context.metrics.timing.assert_any_call(
             "worker.redis_connection.time", mock.ANY

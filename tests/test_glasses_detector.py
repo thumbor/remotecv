@@ -1,9 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import numbers
 from unittest import TestCase
-
-from preggy import expect
 
 from remotecv.detectors.glasses_detector import GlassesDetector
 from tests import create_image
@@ -14,12 +13,12 @@ class GlassesDetectorTestCase(TestCase):
         detection_result = GlassesDetector().detect(
             create_image("glasses.jpg")
         )
-        expect(detection_result).to_length(2)
-        expect(detection_result[0][0]).to_be_numeric()
-        expect(detection_result[0][1]).to_be_numeric()
-        expect(detection_result[0][2]).to_be_numeric()
-        expect(detection_result[0][3]).to_be_numeric()
-        expect(detection_result[1][0]).to_be_numeric()
-        expect(detection_result[1][1]).to_be_numeric()
-        expect(detection_result[1][2]).to_be_numeric()
-        expect(detection_result[1][3]).to_be_numeric()
+        assert len(detection_result) == 2
+        assert isinstance(detection_result[0][0], numbers.Number)
+        assert isinstance(detection_result[0][1], numbers.Number)
+        assert isinstance(detection_result[0][2], numbers.Number)
+        assert isinstance(detection_result[0][3], numbers.Number)
+        assert isinstance(detection_result[1][0], numbers.Number)
+        assert isinstance(detection_result[1][1], numbers.Number)
+        assert isinstance(detection_result[1][2], numbers.Number)
+        assert isinstance(detection_result[1][3], numbers.Number)

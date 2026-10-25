@@ -6,7 +6,6 @@ import json
 import time
 from unittest import mock
 
-from preggy import expect
 from thumbor.testing import TestCase
 from tornado.testing import gen_test
 
@@ -28,7 +27,7 @@ class RedisStorageTestCase(TestCase):
         result_store = ResultStore(config)
 
         value = client.get("thumbor-detector-key")
-        expect(value).to_be_null()
+        assert value is None
 
         result_store.store("key", points)
 
@@ -54,12 +53,12 @@ class RedisStorageTestCase(TestCase):
             ]
         )
 
-        expect(value).to_equal(points_serialized)
+        assert value == points_serialized.encode()
 
         time.sleep(3)
 
         value = client.get("thumbor-detector-key")
-        expect(value).to_be_null()
+        assert value is None
 
     def test_should_send_store_metrics(self):
         config.redis_key_expire_time = 2

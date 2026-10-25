@@ -9,6 +9,10 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "monthly"
+    ignore:
+      # OpenCV 5 moved CascadeClassifier to opencv_contrib, see #150.
+      - dependency-name: "opencv-python-headless"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

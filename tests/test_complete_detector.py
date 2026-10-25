@@ -1,9 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import numbers
 from unittest import TestCase
-
-from preggy import expect
 
 from remotecv.detectors.complete_detector import CompleteDetector
 from tests import create_image
@@ -14,8 +13,8 @@ class CompleteDetectorTestCase(TestCase):
         detection_result = CompleteDetector().detect(
             create_image("profile_face.jpg")
         )
-        expect(len(detection_result)).to_be_greater_than(20)
-        expect(detection_result[0][0]).to_be_numeric()
-        expect(detection_result[0][1]).to_be_numeric()
-        expect(detection_result[0][2]).to_be_numeric()
-        expect(detection_result[0][3]).to_be_numeric()
+        assert len(detection_result) > 20
+        assert isinstance(detection_result[0][0], numbers.Number)
+        assert isinstance(detection_result[0][1], numbers.Number)
+        assert isinstance(detection_result[0][2], numbers.Number)
+        assert isinstance(detection_result[0][3], numbers.Number)

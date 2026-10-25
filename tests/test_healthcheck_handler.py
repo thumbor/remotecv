@@ -5,8 +5,6 @@ import socket
 from unittest import TestCase
 from urllib import request
 
-from preggy import expect
-
 from remotecv import worker
 from remotecv.healthcheck import HealthCheckHandler
 from remotecv.utils import config
@@ -30,26 +28,26 @@ class HealthCheckTestCase(TestCase):
     def test_should_be_200_and_working(self):
         response = self.get()
 
-        expect(response.status).to_equal(200)
-        expect(response.read().decode()).to_equal("WORKING")
+        assert response.status == 200
+        assert response.read().decode() == "WORKING"
 
     def test_should_not_expose_python_version(self):
         response = self.get()
 
-        expect(response.headers["Server"]).to_equal("remotecv")
+        assert response.headers["Server"] == "remotecv"
 
     def test_should_answer_while_another_connection_is_idle(self):
         idle = socket.create_connection(("127.0.0.1", self.port))
         try:
             response = self.get()
-            expect(response.status).to_equal(200)
+            assert response.status == 200
         finally:
             idle.close()
 
     def test_should_close_idle_connection_after_timeout(self):
         with socket.create_connection(("127.0.0.1", self.port)) as idle:
             idle.settimeout(HealthCheckHandler.timeout + 1)
-            expect(idle.recv(1)).to_equal(b"")
+            assert idle.recv(1) == b""
 
     def test_should_bind_ipv6_address(self):
         config.server_host = "::1"
@@ -58,7 +56,7 @@ class HealthCheckTestCase(TestCase):
             response = request.urlopen(
                 f"http://[::1]:{httpd.server_address[1]}/", timeout=3
             )
-            expect(response.status).to_equal(200)
+            assert response.status == 200
         finally:
             httpd.shutdown()
 
@@ -69,7 +67,7 @@ class HealthCheckTestCase(TestCase):
             response = request.urlopen(
                 f"http://[::1]:{httpd.server_address[1]}/", timeout=3
             )
-            expect(response.status).to_equal(200)
+            assert response.status == 200
         finally:
             httpd.shutdown()
 
@@ -79,5 +77,5 @@ class HealthCheckTestCase(TestCase):
                 sock.sendall(b"GET /\x1b[31mred\x1b[0m HTTP/1.0\r\n\r\n")
                 sock.recv(1024)
 
-        expect(logs.output[0]).to_include("GET /\\x1b[31mred\\x1b[0m")
-        expect(logs.output[0]).Not.to_include("\x1b")
+        assert "GET /\\x1b[31mred\\x1b[0m" in logs.output[0]
+        assert "\x1b" not in logs.output[0]

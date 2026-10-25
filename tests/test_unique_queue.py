@@ -4,7 +4,6 @@
 from unittest import TestCase, mock
 from urllib.parse import quote
 
-from preggy import expect
 from pyres.job import Job
 
 from remotecv import http_loader
@@ -26,34 +25,34 @@ class UniqueQueueTestCase(TestCase):
 
     def test_should_create_unique_key_simple(self):
         key = self.unique_queue._create_unique_key("foo", "bar")
-        expect(key).to_equal("resque:unique:queue:foo:bar")
+        assert key == "resque:unique:queue:foo:bar"
 
     def test_should_create_unique_key_spaced(self):
         key = self.unique_queue._create_unique_key("foo", "bar bar")
-        expect(key).to_equal("resque:unique:queue:foo:barbar")
+        assert key == "resque:unique:queue:foo:barbar"
 
     def test_should_create_unique_key_new_line(self):
         key = self.unique_queue._create_unique_key("foo", "bar\nbar")
-        expect(key).to_equal("resque:unique:queue:foo:barbar")
+        assert key == "resque:unique:queue:foo:barbar"
 
     def test_should_add_unique_key(self):
         result = self.unique_queue.add_unique_key("foo", "bar")
-        expect(result).to_be_true()
+        assert result
 
     def test_should_add_unique_key_twice(self):
         result = self.unique_queue.add_unique_key("foo", "bar")
-        expect(result).to_be_true()
+        assert result
         result = self.unique_queue.add_unique_key("foo", "bar")
-        expect(result).to_be_false()
+        assert not result
 
     def test_should_delete_unique_key(self):
         result = self.unique_queue.add_unique_key("foo", "bar")
-        expect(result).to_be_true()
+        assert result
 
         self.unique_queue.del_unique_key("foo", "bar")
 
         value = self.client.get("resque:unique:queue:foo:bar")
-        expect(value).to_be_null()
+        assert value is None
 
     def test_should_enqueue_from_string(self):
         klass = "foo.bar"
@@ -63,7 +62,7 @@ class UniqueQueueTestCase(TestCase):
         self.unique_queue.enqueue_unique_from_string(klass, queue, key=key)
         value = self.client.get("resque:unique:queue:foo:bar")
 
-        expect(value).Not.to_be_null()
+        assert value is not None
 
     def test_should_enqueue_from_string_twice(self):
         klass = "foo.bar"
@@ -71,21 +70,21 @@ class UniqueQueueTestCase(TestCase):
         key = "bar"
 
         keys = len(self.client.keys())
-        expect(keys).to_equal(0)
+        assert keys == 0
 
         self.unique_queue.enqueue_unique_from_string(klass, queue, key=key)
         value = self.client.get("resque:unique:queue:foo:bar")
 
-        expect(value).not_to_be_null()
+        assert value is not None
 
         self.unique_queue.enqueue_unique_from_string(klass, queue, key=key)
         value = self.client.get("resque:unique:queue:foo:bar")
         queue_value = self.client.llen("resque:queue:foo")
         queues_value = self.client.smembers("resque:queues")
 
-        expect(value).not_to_be_null()
-        expect(queue_value).to_equal(1)
-        expect(queues_value).to_equal({b"foo"})
+        assert value is not None
+        assert queue_value == 1
+        assert queues_value == {b"foo"}
 
     def test_should_not_log_credentials_when_enqueuing(self):
         image_url = quote("http://user:s3cret@images.example.com/a.jpg?sig=x")
@@ -99,10 +98,10 @@ class UniqueQueueTestCase(TestCase):
                     key=image_url,
                 )
 
-        expect(logs.output).to_length(3)
+        assert len(logs.output) == 3
         for line in logs.output:
-            expect(line).Not.to_include("s3cret")
-            expect(line).Not.to_include("sig")
+            assert "s3cret" not in line
+            assert "sig" not in line
 
     def test_should_send_metrics(self):
         context.metrics = mock.Mock()
@@ -134,17 +133,13 @@ class UniqueWorkerTestCase(TestCase):
         config.worker_ttl = None
         worker = UniqueWorker(server=self.redis, queues=["Detect"])
         worker.register_worker()
-        expect(
-            self.redis.ttl(f"resque:worker:{str(worker)}:started")
-        ).to_equal(-1)
+        assert self.redis.ttl(f"resque:worker:{str(worker)}:started") == -1
 
     def test_should_create_unique_worker_with_ttl(self):
         config.worker_ttl = 60
         worker = UniqueWorker(server=self.redis, queues=["Detect"])
         worker.register_worker()
-        expect(
-            self.redis.ttl(f"resque:worker:{str(worker)}:started")
-        ).Not.to_equal(-1)
+        assert self.redis.ttl(f"resque:worker:{str(worker)}:started") != -1
 
     def test_should_prune_dead_members_on_startup(self):
         config.prune_dead_members = True
@@ -152,13 +147,13 @@ class UniqueWorkerTestCase(TestCase):
         self.redis.sadd("resque:workers", "teste:1:Detect")
 
         members = self.redis.smembers("resque:workers")
-        expect(len(members)).to_be_greater_than(1)
+        assert len(members) > 1
 
         worker.startup()
 
         members = self.redis.smembers("resque:workers")
-        expect(len(members)).to_equal(1)
-        expect(str(worker).encode() in members).to_be_true()
+        assert len(members) == 1
+        assert str(worker).encode() in members
 
     def test_should_not_prune_dead_members_on_startup(self):
         config.prune_dead_members = False
@@ -168,8 +163,8 @@ class UniqueWorkerTestCase(TestCase):
         worker.startup()
 
         members = self.redis.smembers("resque:workers")
-        expect(len(members)).to_equal(2)
-        expect(str(worker).encode() in members).to_be_true()
+        assert len(members) == 2
+        assert str(worker).encode() in members
 
     def make_job(self, klass):
         payload = {
@@ -182,7 +177,7 @@ class UniqueWorkerTestCase(TestCase):
 
     def test_should_accept_detect_task_before_process(self):
         job = self.make_job("remotecv.pyres_tasks.DetectTask")
-        expect(self.unique_queue.before_process(job)).to_equal(job)
+        assert self.unique_queue.before_process(job) == job
 
     def test_should_refuse_unexpected_class_before_process(self):
         self.unique_queue.resq.add_unique_key("Detect", "key")
@@ -191,7 +186,7 @@ class UniqueWorkerTestCase(TestCase):
         with self.assertRaisesRegex(ValueError, "os.system"):
             self.unique_queue.before_process(job)
 
-        expect(self.redis.get("resque:unique:queue:Detect:key")).to_be_null()
+        assert self.redis.get("resque:unique:queue:Detect:key") is None
 
     def test_should_fail_job_with_unexpected_class(self):
         failed_before = self.redis.llen("resque:failed")
@@ -200,7 +195,7 @@ class UniqueWorkerTestCase(TestCase):
             self.unique_queue.process(self.make_job("os.system"))
 
         perform.assert_not_called()
-        expect(self.redis.llen("resque:failed")).to_equal(failed_before + 1)
+        assert self.redis.llen("resque:failed") == failed_before + 1
 
     def test_should_not_log_credentials_in_job_args(self):
         self.redis.delete("resque:queue:Detect")
@@ -215,10 +210,10 @@ class UniqueWorkerTestCase(TestCase):
         with self.assertLogs("pyres.worker", level="INFO") as logs:
             job = self.unique_queue.reserve(timeout=1)
 
-        expect(str(job)).to_include("http://images.example.com/a.jpg")
+        assert "http://images.example.com/a.jpg" in str(job)
         for text in [str(job), *logs.output]:
-            expect(text).Not.to_include("s3cret")
-            expect(text).Not.to_include("sig")
+            assert "s3cret" not in text
+            assert "sig" not in text
 
     def test_should_reserve_job_with_invalid_url(self):
         self.redis.delete("resque:queue:Detect")
@@ -232,8 +227,8 @@ class UniqueWorkerTestCase(TestCase):
 
         job = self.unique_queue.reserve(timeout=1)
 
-        expect(str(job)).to_include("<invalid url>")
-        expect(str(job)).Not.to_include("s3cret")
+        assert "<invalid url>" in str(job)
+        assert "s3cret" not in str(job)
 
     def test_should_reserve_job_with_unexpected_args(self):
         queue = UniqueQueue(server=self.redis)
@@ -250,7 +245,7 @@ class UniqueWorkerTestCase(TestCase):
 
             job = self.unique_queue.reserve(timeout=1)
 
-            expect(str(job)).to_include(str(args))
+            assert str(args) in str(job)
 
     def test_should_not_log_credentials_in_nested_job_args(self):
         self.redis.delete("resque:queue:Detect")
@@ -266,9 +261,9 @@ class UniqueWorkerTestCase(TestCase):
 
         job = self.unique_queue.reserve(timeout=1)
 
-        expect(str(job)).to_include("http://images.example.com/a.jpg")
-        expect(str(job)).Not.to_include("s3cret")
-        expect(str(job)).Not.to_include("sig")
+        assert "http://images.example.com/a.jpg" in str(job)
+        assert "s3cret" not in str(job)
+        assert "sig" not in str(job)
 
     def test_should_not_log_credentials_when_job_fails(self):
         config.loader = http_loader
@@ -285,10 +280,10 @@ class UniqueWorkerTestCase(TestCase):
         with self.assertLogs("pyres.worker", level="ERROR") as logs:
             self.unique_queue.process(job)
 
-        expect(logs.output[0]).to_include("invalid image URL")
+        assert "invalid image URL" in logs.output[0]
         for line in logs.output:
-            expect(line).Not.to_include("s3cret")
-            expect(line).Not.to_include("sig")
+            assert "s3cret" not in line
+            assert "sig" not in line
 
     def test_should_flush_sentry_after_a_failed_job(self):
         calls = []
@@ -308,4 +303,4 @@ class UniqueWorkerTestCase(TestCase):
         ):
             self.unique_queue.process(job)
 
-        expect(calls).to_equal(["fail", "flush"])
+        assert calls == ["fail", "flush"]

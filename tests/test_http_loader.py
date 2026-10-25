@@ -13,8 +13,6 @@ from threading import Thread
 from unittest import TestCase, mock
 from urllib.error import URLError
 
-from preggy import expect
-
 from remotecv import __version__
 from remotecv.http_loader import (
     DEFAULT_USER_AGENT,
@@ -85,16 +83,14 @@ class HttpLoaderTestCase(TestCase):
         config.loader_user_agent = DEFAULT_USER_AGENT
 
     def test_should_load_image(self):
-        expect(load_sync(f"{self.base_url}/small")).to_equal(SMALL_BODY)
+        assert load_sync(f"{self.base_url}/small") == SMALL_BODY
 
     def test_should_prepend_http_when_scheme_is_missing(self):
         url = f"{self.base_url}/small"[len("http://") :]
-        expect(load_sync(url)).to_equal(SMALL_BODY)
+        assert load_sync(url) == SMALL_BODY
 
     def test_should_follow_http_redirect(self):
-        expect(load_sync(f"{self.base_url}/redirect-http")).to_equal(
-            SMALL_BODY
-        )
+        assert load_sync(f"{self.base_url}/redirect-http") == SMALL_BODY
 
     def test_should_refuse_redirect_to_other_scheme(self):
         with self.assertRaisesRegex(
@@ -108,41 +104,38 @@ class HttpLoaderTestCase(TestCase):
 
     def test_should_allow_body_within_limit(self):
         config.loader_max_body_size = len(LARGE_BODY)
-        expect(load_sync(f"{self.base_url}/large")).to_equal(LARGE_BODY)
+        assert load_sync(f"{self.base_url}/large") == LARGE_BODY
 
     def test_should_refuse_body_by_content_length(self):
         config.loader_max_body_size = len(LARGE_BODY) - 1
-        with expect.error_to_happen(BodyTooLargeError):
+        with self.assertRaises(BodyTooLargeError):
             load_sync(f"{self.base_url}/large")
 
     def test_should_refuse_body_without_content_length(self):
         config.loader_max_body_size = len(LARGE_BODY) - 1
-        with expect.error_to_happen(BodyTooLargeError):
+        with self.assertRaises(BodyTooLargeError):
             load_sync(f"{self.base_url}/large-no-length")
 
     def test_should_ignore_malformed_content_length(self):
         config.loader_max_body_size = len(LARGE_BODY) - 1
-        expect(load_sync(f"{self.base_url}/small-bad-length")).to_equal(
-            SMALL_BODY
-        )
-        with expect.error_to_happen(BodyTooLargeError):
+        assert load_sync(f"{self.base_url}/small-bad-length") == SMALL_BODY
+        with self.assertRaises(BodyTooLargeError):
             load_sync(f"{self.base_url}/large-bad-length")
 
     def test_should_time_out(self):
         config.loader_timeout = 0.2
-        with expect.error_to_happen((URLError, TimeoutError)):
+        with self.assertRaises((URLError, TimeoutError)):
             load_sync(f"{self.base_url}/slow")
 
     def test_should_send_default_user_agent(self):
-        expect(load_sync(f"{self.base_url}/user-agent")).to_equal(
-            f"remotecv/{__version__}".encode()
+        assert (
+            load_sync(f"{self.base_url}/user-agent")
+            == f"remotecv/{__version__}".encode()
         )
 
     def test_should_send_configured_user_agent(self):
         config.loader_user_agent = "Thumbor/7.8.0"
-        expect(load_sync(f"{self.base_url}/user-agent")).to_equal(
-            b"Thumbor/7.8.0"
-        )
+        assert load_sync(f"{self.base_url}/user-agent") == b"Thumbor/7.8.0"
 
     def test_should_send_metrics(self):
         load_sync(f"{self.base_url}/small")
@@ -168,12 +161,10 @@ class HttpLoaderMetricsTestCase(TestCase):
         names = [
             call.args[0] for call in context.metrics.incr.call_args_list
         ] + [call.args[0] for call in context.metrics.timing.call_args_list]
-        expect(names).to_include(
-            "worker.original_image.fetch.200.images_example_com"
-        )
+        assert "worker.original_image.fetch.200.images_example_com" in names
         for name in names:
-            expect(name).Not.to_include("s3cret")
-            expect(name).Not.to_include("8080")
+            assert "s3cret" not in name
+            assert "8080" not in name
 
     @mock.patch("remotecv.http_loader.build_opener")
     def test_should_not_put_colons_of_ipv6_host_in_metric_names(
@@ -203,21 +194,17 @@ class HttpLoaderMetricsTestCase(TestCase):
             with self.assertRaises(ValueError) as error:
                 load_sync(url)
 
-            expect(str(error.exception)).to_equal(
-                f"invalid image URL {redacted}"
-            )
-            expect(error.exception.__suppress_context__).to_be_true()
+            assert str(error.exception) == f"invalid image URL {redacted}"
+            assert error.exception.__suppress_context__
 
     def test_should_refuse_scheme_less_url_without_echoing_it(self):
         with self.assertRaises(URLError) as error:
             load_sync("https-images.example.com/a.jpg?sig=abc")
 
-        expect(str(error.exception)).Not.to_include("sig")
+        assert "sig" not in str(error.exception)
 
     def test_should_not_leak_password_after_encoded_slash_in_error(self):
         with self.assertRaises(ValueError) as error:
             load_sync("http://user:ab%2Fcd@images.example.com/image.jpg")
 
-        expect(str(error.exception)).to_equal(
-            "invalid image URL <invalid url>"
-        )
+        assert str(error.exception) == "invalid image URL <invalid url>"

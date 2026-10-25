@@ -80,7 +80,6 @@ class HttpLoaderTestCase(TestCase):
         cls.httpd.server_close()
 
     def setUp(self):
-        context.metrics = mock.Mock()
         config.loader_timeout = 5.0
         config.loader_max_body_size = 0
         config.loader_user_agent = DEFAULT_USER_AGENT
@@ -156,9 +155,6 @@ class HttpLoaderTestCase(TestCase):
 
 
 class HttpLoaderMetricsTestCase(TestCase):
-    def setUp(self):
-        context.metrics = mock.Mock()
-
     @mock.patch("remotecv.http_loader.build_opener")
     def test_should_not_put_credentials_in_metric_names(
         self, build_opener_mock

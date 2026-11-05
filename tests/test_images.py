@@ -1,7 +1,7 @@
 import struct
 import warnings
 from io import BytesIO
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from PIL import Image as PilImage
 
@@ -100,3 +100,27 @@ class ImageTest(TestCase):
             warnings.simplefilter("ignore", PilImage.DecompressionBombWarning)
             image = Image.create_from_buffer(png_with_size(side, side))
         assert image is not None
+
+    def test_should_handle_ioerror_on_image_load(self):
+        pil_img = mock.MagicMock(spec=PilImage.Image)
+        pil_img.is_animated = False
+        pil_img.width = pil_img.height = 1
+        pil_img.load.side_effect = IOError("truncated")
+
+        with mock.patch("remotecv.image.PilImage.open", return_value=pil_img):
+            img = Image.create_from_buffer(b"data")
+
+        # Should still return the image (IOError on load is non-fatal)
+        assert img is not None
+
+    def test_should_clear_metadata_without_tag_attributes(self):
+        config.clear_image_metadata = True
+        pil_img = mock.MagicMock(spec=PilImage.Image)
+        pil_img.is_animated = False
+        pil_img.width = pil_img.height = 1
+        pil_img.load.return_value = None
+
+        with mock.patch("remotecv.image.PilImage.open", return_value=pil_img):
+            img = Image.create_from_buffer(b"data")
+
+        assert img is not None

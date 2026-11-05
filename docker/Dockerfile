@@ -16,7 +16,7 @@ RUN python3 -m venv /home/remotecv/venv
 ENV PATH="/home/remotecv/venv/bin:$PATH"
 
 RUN pip3 install --no-cache-dir wheel && \
-    pip3 install --no-cache-dir remotecv==${REMOTECV_VERSION}
+    pip3 install --no-cache-dir "remotecv[sqs]==${REMOTECV_VERSION}"
 
 FROM python:${PYTHON_VERSION}-slim-trixie AS runner-image
 

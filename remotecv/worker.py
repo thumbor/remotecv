@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # remote cv service
@@ -10,13 +9,20 @@
 
 import logging
 import math
-import sys
+import os
 from importlib import import_module
+from importlib.util import find_spec
 from threading import Thread
+from urllib.parse import quote
 
 import click
 from click_option_group import optgroup
 
+from remotecv.celery_tasks import (
+    CeleryTasks,
+    CeleryUniqueQueue,
+    build_sqs_broker,
+)
 from remotecv.error_handler import ErrorHandler
 from remotecv.healthcheck import HealthCheckHandler, HealthCheckServer
 from remotecv.http_loader import DEFAULT_USER_AGENT
@@ -25,32 +31,42 @@ from remotecv.importer import Importer
 from remotecv.utils import SENTINEL, SINGLE_NODE, config, context, redis_client
 
 
-def start_pyres_worker():
-    from remotecv.unique_queue import (  # NOQA pylint: disable=import-outside-toplevel
-        UniqueWorker,
-    )
+def _redis_url_auth(password):
+    if not password:
+        return ""
+    return f":{quote(password, safe='')}@"
 
-    redis = redis_client()
 
-    worker = UniqueWorker(
-        queues=["Detect"],
-        server=redis,
-        timeout=config.timeout,
-    )
-    worker.work()
+def _build_redis_broker_url():
+    if config.redis_mode == SENTINEL:
+        auth = _redis_url_auth(config.redis_sentinel_master_password)
+        db = config.redis_sentinel_master_database
+        return ";".join(
+            f"sentinel://{auth}{instance}/{db}"
+            for instance in config.redis_sentinel_instances.split(",")
+        )
+    auth = _redis_url_auth(config.redis_password)
+    host = f"{config.redis_host}:{config.redis_port}"
+    return f"redis://{auth}{host}/{config.redis_database}"
+
+
+def _build_redis_broker_transport_options():
+    if config.redis_mode != SENTINEL:
+        return None
+    options = {"master_name": config.redis_sentinel_master_instance}
+    if config.redis_sentinel_password:
+        options["sentinel_kwargs"] = {
+            "password": config.redis_sentinel_password
+        }
+    return options
 
 
 def start_celery_worker():
-    from remotecv.celery_tasks import (  # NOQA pylint: disable=import-outside-toplevel
-        CeleryTasks,
-    )
-
     celery_tasks = CeleryTasks(
-        config.key_id,
-        config.key_secret,
-        config.region,
-        config.timeout,
-        config.polling_interval,
+        config.broker_url,
+        config.broker_transport_options,
+        unique_queue=CeleryUniqueQueue(redis_client()),
+        time_limit=config.timeout,
     )
     celery_tasks.run_commands(config.extra_args, log_level=config.log_level)
 
@@ -91,17 +107,7 @@ def import_modules():
 
 
 @click.command()
-@optgroup.group("Worker Backend")
-@optgroup.option(
-    "-b",
-    "--backend",
-    envvar="BACKEND",
-    show_envvar=True,
-    default="pyres",
-    type=click.Choice(["pyres", "celery"]),
-    help="Worker backend",
-)
-@optgroup.group("Pyres Connection Arguments")
+@optgroup.group("Redis Connection Arguments")
 @optgroup.option(
     "--host",
     envvar="REDIS_HOST",
@@ -187,7 +193,15 @@ def import_modules():
     default=10.0,
     help="Redis Sentinel socket timeout",
 )
-@optgroup.group("Celery/SQS Connection Arguments")
+@optgroup.group("Celery Connection Arguments")
+@optgroup.option(
+    "--broker",
+    envvar="CELERY_BROKER",
+    show_envvar=True,
+    default="redis",
+    type=click.Choice(["sqs", "redis"]),
+    help="Celery broker backend",
+)
 @optgroup.option(
     "--region",
     envvar="AWS_REGION",
@@ -315,22 +329,6 @@ def import_modules():
     help="Timeout in seconds for image detection",
 )
 @optgroup.option(
-    "--worker-ttl",
-    envvar="WORKER_TTL",
-    show_envvar=True,
-    default=None,
-    type=click.INT,
-    help="TTL in seconds for worker",
-)
-@optgroup.option(
-    "--prune-dead-members",
-    envvar="PRUNE_DEAD_MEMBERS",
-    show_envvar=True,
-    is_flag=True,
-    default=False,
-    help="Prune dead members on startup",
-)
-@optgroup.option(
     "--sentry-url",
     envvar="SENTRY_URL",
     show_envvar=True,
@@ -371,12 +369,16 @@ def import_modules():
 def main(**params):
     """Runs RemoteCV"""
 
+    if os.environ.get("BACKEND"):
+        raise click.UsageError(
+            "BACKEND is no longer supported, use --broker or CELERY_BROKER"
+        )
+
     logging.basicConfig(
         level=getattr(logging, params["level"].upper()),
         format=params["format"],
     )
 
-    config.backend = params["backend"]
     config.redis_host = params["host"]
     config.redis_port = params["port"]
     config.redis_database = params["database"]
@@ -390,14 +392,32 @@ def main(**params):
     config.redis_sentinel_master_password = params["master_password"]
     config.redis_sentinel_master_database = params["master_database"]
 
-    config.region = params["region"]
-    config.key_id = params["key_id"]
-    config.key_secret = params["key_secret"]
-    config.polling_interval = params["polling_interval"]
-
     config.timeout = params["timeout"]
-    config.worker_ttl = params["worker_ttl"]
-    config.prune_dead_members = params["prune_dead_members"]
+
+    if params["broker"] == "sqs":
+        if find_spec("boto3") is None:
+            raise click.UsageError(
+                "--broker=sqs needs the sqs extra: "
+                "pip install 'remotecv[sqs]'"
+            )
+        try:
+            sqs_broker = build_sqs_broker(
+                params["key_id"],
+                params["key_secret"],
+                params["region"],
+                params["timeout"],
+                params["polling_interval"],
+            )
+        except ValueError as error:
+            raise click.UsageError(
+                "--key-id and --key-secret must be set together"
+            ) from error
+        config.broker_url, config.broker_transport_options = sqs_broker
+    else:
+        config.broker_url = _build_redis_broker_url()
+        config.broker_transport_options = (
+            _build_redis_broker_transport_options()
+        )
     config.clear_image_metadata = params["clear_image_metadata"]
     config.max_image_pixels = params["max_image_pixels"]
     config.server_host = params["server_host"]
@@ -413,7 +433,7 @@ def main(**params):
 
     config.memcache_hosts = params["memcached_hosts"]
 
-    config.extra_args = sys.argv[:1] + list(params["celery_commands"])
+    config.extra_args = list(params["celery_commands"]) or ["worker"]
 
     config.error_handler = ErrorHandler(params["sentry_url"])
 
@@ -422,10 +442,7 @@ def main(**params):
     if params["with_healthcheck"]:
         start_http_server()
 
-    if params["backend"] == "pyres":
-        start_pyres_worker()
-    elif params["backend"] == "celery":
-        start_celery_worker()
+    start_celery_worker()
 
 
 if __name__ == "__main__":

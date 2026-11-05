@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # thumbor imaging service
@@ -44,7 +43,8 @@ def redact_url(url):
     try:
         parts = urlsplit(url if has_authority else f"//{url}")
     except ValueError:
-        # pyres formats str(job) outside any handler when it reserves a job.
+        # Callers format this into log lines and error messages, which must
+        # not fail because the URL they describe is malformed.
         return "<invalid url>"
 
     netloc = parts.hostname or ""

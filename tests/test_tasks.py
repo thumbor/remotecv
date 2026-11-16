@@ -1,10 +1,16 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+# thumbor imaging service
+# https://github.com/thumbor/thumbor/wiki
+
+# Licensed under the MIT license:
+# http://www.opensource.org/licenses/mit-license
+# Copyright (c) 2026 Marcelo Jorge Vieira <metal@alucinados.com>
 
 import numbers
 from unittest import TestCase, mock
 
-from remotecv.pyres_tasks import DetectTask
+from remotecv.tasks import DetectTask
 from remotecv.utils import config
 from tests import read_fixture
 

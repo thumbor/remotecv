@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from unittest import TestCase, mock
@@ -31,6 +30,7 @@ class RedisSingleNodeClientTestCase(TestCase):
         config.redis_mode = "single_node"
 
         client = redis_client()
+
         assert client is not None
         connection_kwargs = client.connection_pool.connection_kwargs
         assert connection_kwargs["host"] == "localhost"
@@ -50,6 +50,7 @@ class RedisSentinelClientTestCase(TestCase):
         config.redis_sentinel_socket_timeout = 10.0
 
         client = redis_client()
+
         assert client is not None
         connection_pool = client.connection_pool
         assert connection_pool.service_name == "redismaster"
@@ -67,6 +68,7 @@ class RedisSentinelClientTestCase(TestCase):
         config.redis_sentinel_socket_timeout = 10.0
 
         client = redis_client()
+
         assert client is not None
         connection_pool = client.connection_pool
         assert connection_pool.service_name == "redismaster"

@@ -10,6 +10,7 @@ from remotecv.timing import get_interval, get_time
 from remotecv.utils import context, logger, redact_url
 
 DETECT_QUEUE = "detect"
+BROKER_QUEUE = "remotecv-detect"
 UNIQUE_KEY_EXPIRE_TIME = 1209600
 
 
@@ -28,6 +29,10 @@ def build_sqs_broker(
         raise ValueError("AWS key id and secret must be set together")
     auth = f"{quote(key_id, safe='')}:{quote(key_secret, safe='')}"
     return f"sqs://{auth}@", transport_options
+
+
+def _is_sqs(broker_url):
+    return isinstance(broker_url, str) and broker_url.startswith("sqs://")
 
 
 class CeleryUniqueQueue:
@@ -91,6 +96,12 @@ class CeleryTasks:
         time_limit=None,
     ):
         self.celery = Celery(broker=broker_url)
+        # Celery's default queue is the bare "celery" key, which any other
+        # Celery application on the same Redis database also consumes. SQS
+        # keeps it: build_sqs_broker already prefixes the queue name, and
+        # that is where 5.x producers publish.
+        if not _is_sqs(broker_url):
+            self.celery.conf.update(task_default_queue=BROKER_QUEUE)
 
         if broker_transport_options:
             self.celery.conf.update(

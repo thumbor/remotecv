@@ -18,6 +18,7 @@ from kombu.utils.url import parse_url
 from redis.exceptions import ConnectionError as RedisConnectionError
 
 from remotecv.celery_tasks import (
+    BROKER_QUEUE,
     DETECT_QUEUE,
     CeleryTasks,
     CeleryUniqueQueue,
@@ -397,6 +398,35 @@ class CeleryTasksTestCase(TestCase):
         assert "images.example.com/a.jpg" in logs.output[0]
         assert "s3cret" not in logs.output[0]
         assert "sig" not in logs.output[0]
+
+    def test_should_use_a_dedicated_queue_on_redis(self):
+        celery_tasks = CeleryTasks("redis://localhost:6380/0")
+
+        assert BROKER_QUEUE == "remotecv-detect"
+        assert celery_tasks.celery.conf.task_default_queue == BROKER_QUEUE
+        assert celery_tasks.celery.amqp.default_queue.name == BROKER_QUEUE
+
+    def test_should_use_a_dedicated_queue_on_sentinel(self):
+        celery_tasks = CeleryTasks(
+            "sentinel://localhost:26379/0;sentinel://localhost:26380/0",
+            {"master_name": "redismaster"},
+        )
+
+        assert celery_tasks.celery.conf.task_default_queue == BROKER_QUEUE
+
+    def test_should_use_a_dedicated_queue_for_a_list_of_brokers(self):
+        celery_tasks = CeleryTasks(
+            ["redis://localhost:6380/0", "redis://localhost:6381/0"]
+        )
+
+        assert celery_tasks.celery.conf.task_default_queue == BROKER_QUEUE
+
+    def test_should_keep_the_prefixed_default_queue_on_sqs(self):
+        celery_tasks = CeleryTasks(
+            *build_sqs_broker("key", "secret", "us-east-1")
+        )
+
+        assert celery_tasks.celery.conf.task_default_queue == "celery"
 
     def test_task_uses_time_limit(self):
         celery_tasks = CeleryTasks("memory://", time_limit=30)

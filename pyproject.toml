@@ -62,17 +62,7 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = [
-  "remotecv",
-  "remotecv.detectors",
-  "remotecv.detectors.complete_detector",
-  "remotecv.detectors.face_detector",
-  "remotecv.detectors.feature_detector",
-  "remotecv.detectors.glasses_detector",
-  "remotecv.detectors.profile_detector",
-  "remotecv.metrics",
-  "remotecv.result_store",
-]
+include = ["remotecv*"]
 
 [tool.setuptools.package-data]
 "remotecv.detectors.face_detector" = ["*.xml"]

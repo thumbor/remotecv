@@ -27,6 +27,8 @@ jobs:
           version-file: ".tool-versions"
       - name: Build package
         run: uv build
+      - name: Check that the wheel ships every package file
+        run: diff <(git ls-files remotecv | sort) <(unzip -Z1 dist/*.whl 'remotecv/*' | sort)
       - name: Publish a Python distribution to PyPI
         if: github.event_name != 'pull_request'
         uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3

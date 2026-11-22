@@ -65,6 +65,9 @@ def _build_redis_broker_transport_options():
 
 
 def start_celery_worker():
+    # Loaded before the pool forks, so the children inherit OpenCV and the
+    # cascades instead of each loading its own copy on its first job.
+    import_module("remotecv.tasks")
     celery_tasks = CeleryTasks(
         config.broker_url,
         config.broker_transport_options,

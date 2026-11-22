@@ -22,6 +22,11 @@ class ImageProcessorTest(TestCase):
         )
         assert len(detect) > 0
 
+    def test_with_grayscale_image(self):
+        image_processor = ImageProcessor()
+        detect = image_processor.detect("all", read_fixture("one_face-bw.png"))
+        assert len(detect) > 0
+
     def test_when_not_animated_gif(self):
         image_processor = ImageProcessor()
         detect = image_processor.detect("face", read_fixture("one_face.gif"))

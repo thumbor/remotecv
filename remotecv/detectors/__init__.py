@@ -28,9 +28,32 @@ class BaseDetector:
         results = img_buffer.getvalue()
         img_buffer.close()
         nparr = np.frombuffer(results, np.uint8)
-        return cv2.imdecode(
+        img = cv2.imdecode(
             nparr, cv2.IMREAD_UNCHANGED
         )  # pylint: disable=no-member
+        if img is None or img.dtype == np.uint8:
+            return img
+        if not np.isfinite(img).all():
+            raise ValueError("Image has non-finite pixels")
+        # The detectors take 8-bit input only. The range in use is stretched:
+        # 16-bit files often fill only part of theirs, and a fixed scale would
+        # leave those with a handful of gray levels. Percentiles, because a
+        # single stuck pixel would otherwise set the range, unless they
+        # coincide, as in a small drawing on a flat background.
+        low, high = np.percentile(img, (0.1, 99.9)).astype(img.dtype)
+        if low >= high:
+            low, high = img.min(), img.max()
+        np.clip(img, low, high, out=img)
+        return cv2.normalize(img, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+
+    def get_gray_np_img(self, image):
+        img = self.get_np_img(image)
+        # Decided by what OpenCV decoded, not by the Pillow mode: a
+        # single-channel image comes back without a channel axis. One that
+        # OpenCV could not decode stays None, and the cascades find nothing.
+        if img is None or img.ndim == 2:
+            return img
+        return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     def detect(self, image):
         raise NotImplementedError()
@@ -54,12 +77,7 @@ class CascadeLoaderDetector(BaseDetector):
         return self.get_faces(img, image.size)
 
     def get_grayscale_equalized_features(self, image):
-        img = self.get_np_img(image)
-
-        if image.mode.upper() not in ["L", "1"]:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-        img_equalized = cv2.equalizeHist(img)
+        img_equalized = cv2.equalizeHist(self.get_gray_np_img(image))
 
         return self.get_faces(img_equalized, image.size)
 

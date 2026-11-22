@@ -18,8 +18,7 @@ from remotecv.detectors import BaseDetector
 
 class FeatureDetector(BaseDetector):
     def detect(self, image):
-        img = self.get_np_img(image)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray = self.get_gray_np_img(image)
         corners = cv2.goodFeaturesToTrack(gray, 25, 0.01, 10)
         if corners is None:
             return None

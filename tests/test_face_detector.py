@@ -5,7 +5,7 @@ import numbers
 from unittest import TestCase
 
 from remotecv.detectors.face_detector import FaceDetector
-from tests import create_image
+from tests import create_16_bit_image, create_image, create_image_as
 
 
 class FaceDetectorTestCase(TestCase):
@@ -97,3 +97,21 @@ class FaceDetectorTestCase(TestCase):
         assert isinstance(detection_result[0][1], numbers.Number)
         assert isinstance(detection_result[0][2], numbers.Number)
         assert isinstance(detection_result[0][3], numbers.Number)
+
+    def test_should_run_on_tiff_images_with_mode_la(self):
+        detection_result = FaceDetector().detect(
+            create_image_as("one_face-bw-la.png", "TIFF")
+        )
+        assert len(detection_result) == 1
+
+    def test_should_run_on_16_bit_images(self):
+        detection_result = FaceDetector().detect(
+            create_16_bit_image("one_face.jpg")
+        )
+        assert len(detection_result) == 1
+
+    def test_should_not_detect_on_images_opencv_cannot_decode(self):
+        detection_result = FaceDetector().detect(
+            create_image_as("one_face-bw.png", "PCX")
+        )
+        assert not detection_result

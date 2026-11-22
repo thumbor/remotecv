@@ -30,14 +30,16 @@ classifiers = [
 ]
 
 dependencies = [
-  # Not celery[redis]: kombu caps redis-py below 6.5 while redis is pinned
-  # to 8.x here, and the Redis transport works on it (checked end to end).
+  # Not celery[redis]: kombu 5.6 caps redis-py below 6.5 in that extra, and
+  # its Redis transport works on 8.x (checked end to end).
   "celery>=5.6.2,<6",
   "click-option-group>=0.5.6,<0.6.0",
   "click>=8.1.7,<9",
   "opencv-python-headless>=4.9.0.80,<5",
   "Pillow>=12.3.0,<14",
-  "redis==8.1.0",
+  # The floor is the one kombu 5.7 declares for its Redis transport, which
+  # refuses to start on redis-py older than 6.1.
+  "redis>=6.4.0,<9",
   "sentry-sdk>=1.39.1,<3",
 ]
 

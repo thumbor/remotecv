@@ -177,6 +177,11 @@ tasks = CeleryTasks(
 tasks.enqueue_unique("all", image_url, image_url)
 ```
 
+On Redis the jobs go to the `remotecv-detect` queue instead of Celery's
+default `celery` queue, so another Celery application on the same Redis
+database never receives them. `CeleryTasks` selects that queue by itself; a
+producer that builds its own Celery app has to send to it.
+
 For SQS (with the `sqs` extra installed), `build_sqs_broker` returns the
 broker URL and transport options the worker uses, including the
 `celery-remotecv-` queue prefix:

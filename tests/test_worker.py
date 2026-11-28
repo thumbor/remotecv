@@ -220,6 +220,22 @@ class StartCeleryWorkerTestCase(TestCase):
             log_format=config.log_format,
         )
 
+    @mock.patch("remotecv.worker.redis_client")
+    @mock.patch("remotecv.worker.CeleryTasks")
+    @mock.patch("remotecv.worker.import_module")
+    def test_should_load_the_detectors_before_starting_the_pool(
+        self, import_module_mock, celery_tasks_mock, _redis_client_mock
+    ):
+        def assert_detectors_loaded(*_args, **_kwargs):
+            import_module_mock.assert_called_once_with("remotecv.tasks")
+
+        run_commands = celery_tasks_mock.return_value.run_commands
+        run_commands.side_effect = assert_detectors_loaded
+
+        worker.start_celery_worker()
+
+        run_commands.assert_called_once()
+
 
 class BuildRedisBrokerTestCase(TestCase):
     def setUp(self):

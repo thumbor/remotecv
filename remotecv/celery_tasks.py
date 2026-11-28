@@ -5,7 +5,6 @@ from celery import Celery
 from celery.signals import worker_shutdown
 from redis import RedisError
 
-from remotecv.tasks import DetectTask
 from remotecv.timing import get_interval, get_time
 from remotecv.utils import context, logger, redact_url
 
@@ -110,6 +109,12 @@ class CeleryTasks:
             ignore_result=True, acks_late=True, time_limit=self.time_limit
         )
         def detect_task(detection_type, image_path, key, unique=False):
+            # Producers import this module only to enqueue, and
+            # remotecv.tasks loads OpenCV and its cascades.
+            from remotecv.tasks import (  # pylint: disable=import-outside-toplevel
+                DetectTask,
+            )
+
             # Only enqueue_unique takes a key, so a job sent with delay()
             # must not cost a Redis round trip, or its retries when the
             # deployment has no Redis at all.

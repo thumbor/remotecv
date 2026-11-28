@@ -8,6 +8,8 @@
 # Copyright (c) 2026 Marcelo Jorge Vieira <metal@alucinados.com>
 
 import logging
+import subprocess
+import sys
 from unittest import TestCase, mock
 from urllib.parse import quote
 
@@ -283,7 +285,7 @@ class CeleryTasksTestCase(TestCase):
         # Manually add key as if enqueue_unique was called
         celery_tasks.unique_queue.add_unique_key(DETECT_QUEUE, "my-key")
 
-        with mock.patch("remotecv.celery_tasks.DetectTask") as detect_mock:
+        with mock.patch("remotecv.tasks.DetectTask") as detect_mock:
             detect_mock.perform = mock.Mock()
             # Call the task body directly, bypassing Celery broker
             task_fn = celery_tasks.get_detect_task()
@@ -319,7 +321,7 @@ class CeleryTasksTestCase(TestCase):
         ):
             celery_tasks = CeleryTasks("redis://localhost:6380/0")
 
-        with mock.patch("remotecv.celery_tasks.DetectTask") as detect_mock:
+        with mock.patch("remotecv.tasks.DetectTask") as detect_mock:
             celery_tasks.get_detect_task()(
                 "face", "image.jpg", "my-key", unique=True
             )
@@ -340,7 +342,7 @@ class CeleryTasksTestCase(TestCase):
                 unique_queue=CeleryUniqueQueue(redis_mock),
             )
 
-        with mock.patch("remotecv.celery_tasks.DetectTask") as detect_mock:
+        with mock.patch("remotecv.tasks.DetectTask") as detect_mock:
             celery_tasks.get_detect_task()("face", "image.jpg", "my-key")
 
         detect_mock.perform.assert_called_once_with(
@@ -361,7 +363,7 @@ class CeleryTasksTestCase(TestCase):
                 unique_queue=CeleryUniqueQueue(redis_mock),
             )
 
-        with mock.patch("remotecv.celery_tasks.DetectTask") as detect_mock:
+        with mock.patch("remotecv.tasks.DetectTask") as detect_mock:
             with self.assertLogs("remotecv", level="WARNING") as logs:
                 celery_tasks.get_detect_task()(
                     "face", "image.jpg", "my-key", unique=True
@@ -388,7 +390,7 @@ class CeleryTasksTestCase(TestCase):
             )
         image_url = quote("http://user:s3cret@images.example.com/a.jpg?sig=x")
 
-        with mock.patch("remotecv.celery_tasks.DetectTask"):
+        with mock.patch("remotecv.tasks.DetectTask"):
             with self.assertLogs("remotecv", level="WARNING") as logs:
                 celery_tasks.get_detect_task()(
                     "all", image_url, image_url, unique=True
@@ -445,3 +447,17 @@ class BuildSqsBrokerTestCase(TestCase):
             build_sqs_broker("key", None, "us-east-1")
         with self.assertRaises(ValueError):
             build_sqs_broker(None, "secret", "us-east-1")
+
+
+class ProducerImportTestCase(TestCase):
+    def test_should_not_load_opencv_to_enqueue(self):
+        code = "import sys, remotecv.celery_tasks; print('cv2' in sys.modules)"
+
+        result = subprocess.run(
+            [sys.executable, "-c", code],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        assert result.stdout.strip() == "False"
